@@ -1,0 +1,108 @@
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\PointsLogRepository")
+ */
+class PointsLog
+{
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $mbId;
+
+    /**
+     * @ORM\Column(type="decimal", precision=12, scale=2)
+     */
+    private $points;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $changeReason;
+
+    /**
+     * @ORM\Column(type="decimal", precision=12, scale=2, nullable=true)
+     */
+    private $amount;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $changeTime;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getMbId(): ?int
+    {
+        return $this->mbId;
+    }
+
+    public function setMbId(int $mbId): self
+    {
+        $this->mbId = $mbId;
+
+        return $this;
+    }
+
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    public function setPoints($points): self
+    {
+        $this->points = $points;
+
+        return $this;
+    }
+
+    public function getChangeReason(): ?string
+    {
+        return $this->changeReason;
+    }
+
+    public function setChangeReason(?string $changeReason): self
+    {
+        $this->changeReason = $changeReason;
+
+        return $this;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    public function setAmount($amount): self
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getChangeTime(): ?\DateTimeInterface
+    {
+        return $this->changeTime;
+    }
+
+    public function setChangeTime(\DateTimeInterface $changeTime): self
+    {
+        $this->changeTime = $changeTime;
+
+        return $this;
+    }
+}
