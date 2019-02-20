@@ -41,10 +41,6 @@ class RefundLog
      */
     private $payType;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $checker;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -65,6 +61,16 @@ class RefundLog
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $checkedTime;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="refundLog")
+     */
+    private $member;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="checkRefundLog", cascade={"persist", "remove"})
+     */
+    private $checker;
 
     public function getId(): ?int
     {
@@ -131,18 +137,6 @@ class RefundLog
         return $this;
     }
 
-    public function getChecker(): ?int
-    {
-        return $this->checker;
-    }
-
-    public function setChecker(?int $checker): self
-    {
-        $this->checker = $checker;
-
-        return $this;
-    }
-
     public function getContent(): ?string
     {
         return $this->content;
@@ -187,6 +181,36 @@ class RefundLog
     public function setCheckedTime(?\DateTimeInterface $checkedTime): self
     {
         $this->checkedTime = $checkedTime;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
+
+        return $this;
+    }
+
+    public function getChecker(): ?User
+    {
+        return $this->checker;
+    }
+
+    public function setChecker(?User $user): self
+    {
+        $this->checker = $user;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newCheckRefundLog = $user === null ? null : $this;
+        if ($newCheckRefundLog !== $user->getCheckRefundLog()) {
+            $user->setCheckRefundLog($newCheckRefundLog);
+        }
 
         return $this;
     }

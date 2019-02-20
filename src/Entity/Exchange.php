@@ -41,6 +41,11 @@ class Exchange
      */
     private $status;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="exchangeLog")
+     */
+    private $member;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +107,18 @@ class Exchange
     public function setStatus(?string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
 
         return $this;
     }

@@ -29,19 +29,32 @@ final class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="array")
      */
     private $roles;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $wxId;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="App\Entity\Member", inversedBy="user", cascade={"persist", "remove"})
      */
-    private $mbId;
+    private $member;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Wechat", cascade={"persist", "remove"})
+     */
+    private $wechat;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\RefundLog", inversedBy="checker", cascade={"persist", "remove"})
+     */
+    private $checkRefundLog;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Cash", inversedBy="checker", cascade={"persist", "remove"})
+     */
+    private $checkCashLog;
+
+
 
     public function getId(): ?int
     {
@@ -84,29 +97,6 @@ final class User implements UserInterface
         return $this;
     }
 
-    public function getWxId(): ?int
-    {
-        return $this->wxId;
-    }
-
-    public function setWxId(?int $wxId): self
-    {
-        $this->wxId = $wxId;
-
-        return $this;
-    }
-
-    public function getMbId(): ?int
-    {
-        return $this->mbId;
-    }
-
-    public function setMbId(?int $mbId): self
-    {
-        $this->mbId = $mbId;
-
-        return $this;
-    }
 
     /**
      * Returns the salt that was originally used to encode the password.
@@ -139,5 +129,53 @@ final class User implements UserInterface
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
+
+        return $this;
+    }
+
+    public function getWechat(): ?Wechat
+    {
+        return $this->wechat;
+    }
+
+    public function setWechat(?Wechat $wechat): self
+    {
+        $this->wechat = $wechat;
+
+        return $this;
+    }
+
+    public function getCheckRefundLog(): ?RefundLog
+    {
+        return $this->checkRefundLog;
+    }
+
+    public function setCheckRefundLog(?RefundLog $checkRefundLog): self
+    {
+        $this->checkRefundLog = $checkRefundLog;
+
+        return $this;
+    }
+
+    public function getCheckCashLog(): ?Cash
+    {
+        return $this->checkCashLog;
+    }
+
+    public function setCheckCashLog(?Cash $checkCashLog): self
+    {
+        $this->checkCashLog = $checkCashLog;
+
+        return $this;
     }
 }

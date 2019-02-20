@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -21,15 +23,6 @@ class Trade
      */
     private $tradeNo;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $mbId;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $payId;
 
     /**
      * @ORM\Column(type="integer")
@@ -55,6 +48,27 @@ class Trade
      * @ORM\Column(type="float", nullable=true)
      */
     private $givePoints;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="trades")
+     */
+    private $member;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\GoodsSnapshot", mappedBy="trade")
+     */
+    private $goodsSnapshot;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\PayLog", inversedBy="trade", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $payLog;
+
+    public function __construct()
+    {
+        $this->goodsSnapshot = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -153,6 +167,61 @@ class Trade
     public function setGivePoints(?float $givePoints): self
     {
         $this->givePoints = $givePoints;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|GoodsSnapshot[]
+     */
+    public function getGoodsSnapshot(): Collection
+    {
+        return $this->goodsSnapshot;
+    }
+
+    public function addGoodsSnapshot(GoodsSnapshot $goodsSnapshot): self
+    {
+        if (!$this->goodsSnapshot->contains($goodsSnapshot)) {
+            $this->goodsSnapshot[] = $goodsSnapshot;
+            $goodsSnapshot->setTrade($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGoodsSnapshot(GoodsSnapshot $goodsSnapshot): self
+    {
+        if ($this->goodsSnapshot->contains($goodsSnapshot)) {
+            $this->goodsSnapshot->removeElement($goodsSnapshot);
+            // set the owning side to null (unless already changed)
+            if ($goodsSnapshot->getTrade() === $this) {
+                $goodsSnapshot->setTrade(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPayLog(): ?PayLog
+    {
+        return $this->payLog;
+    }
+
+    public function setPayLog(PayLog $payLog): self
+    {
+        $this->payLog = $payLog;
 
         return $this;
     }

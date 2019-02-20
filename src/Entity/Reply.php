@@ -31,6 +31,11 @@ class Reply
      */
     private $createdTime;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="replies")
+     */
+    private $member;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,6 +73,18 @@ class Reply
     public function setCreatedTime(\DateTimeInterface $createdTime): self
     {
         $this->createdTime = $createdTime;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
 
         return $this;
     }

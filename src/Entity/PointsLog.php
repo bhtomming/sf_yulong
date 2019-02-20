@@ -41,6 +41,11 @@ class PointsLog
      */
     private $changeTime;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="pointsLog")
+     */
+    private $member;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +107,18 @@ class PointsLog
     public function setChangeTime(\DateTimeInterface $changeTime): self
     {
         $this->changeTime = $changeTime;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
 
         return $this;
     }

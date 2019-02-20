@@ -41,6 +41,11 @@ class Assess
      */
     private $rank;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="assess")
+     */
+    private $member;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +107,18 @@ class Assess
     public function setRank(string $rank): self
     {
         $this->rank = $rank;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
 
         return $this;
     }

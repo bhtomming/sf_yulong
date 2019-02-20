@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Memeber;
+use App\Entity\Member;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method Memeber|null find($id, $lockMode = null, $lockVersion = null)
- * @method Memeber|null findOneBy(array $criteria, array $orderBy = null)
- * @method Memeber[]    findAll()
- * @method Memeber[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Member|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Member|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Member[]    findAll()
+ * @method Member[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MemeberRepository extends ServiceEntityRepository
+class MemberRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, Memeber::class);
+        parent::__construct($registry, Member::class);
     }
 
     // /**
-    //  * @return Memeber[] Returns an array of Memeber objects
+    //  * @return Member[] Returns an array of Member objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class MemeberRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Memeber
+    public function findOneBySomeField($value): ?Member
     {
         return $this->createQueryBuilder('m')
             ->andWhere('m.exampleField = :val')

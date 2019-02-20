@@ -21,10 +21,6 @@ class PayLog
      */
     private $tradeNo;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $mbId;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -32,7 +28,7 @@ class PayLog
     private $payNo;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="decimal", precision=15, scale=2)
      */
     private $totalFee;
 
@@ -42,7 +38,7 @@ class PayLog
     private $payType;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="decimal", precision=12, scale=2, nullable=true)
      */
     private $points;
 
@@ -55,6 +51,16 @@ class PayLog
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $status;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="payLog")
+     */
+    private $member;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Trade", mappedBy="payLog", cascade={"persist", "remove"})
+     */
+    private $trade;
 
     public function getId(): ?int
     {
@@ -73,17 +79,6 @@ class PayLog
         return $this;
     }
 
-    public function getMbId(): ?int
-    {
-        return $this->mbId;
-    }
-
-    public function setMbId(int $mbId): self
-    {
-        $this->mbId = $mbId;
-
-        return $this;
-    }
 
     public function getPayNo(): ?string
     {
@@ -97,12 +92,12 @@ class PayLog
         return $this;
     }
 
-    public function getTotalFee(): ?float
+    public function getTotalFee()
     {
         return $this->totalFee;
     }
 
-    public function setTotalFee(float $totalFee): self
+    public function setTotalFee($totalFee): self
     {
         $this->totalFee = $totalFee;
 
@@ -121,12 +116,12 @@ class PayLog
         return $this;
     }
 
-    public function getPoints(): ?float
+    public function getPoints()
     {
         return $this->points;
     }
 
-    public function setPoints(?float $points): self
+    public function setPoints($points): self
     {
         $this->points = $points;
 
@@ -153,6 +148,35 @@ class PayLog
     public function setStatus(?string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
+
+        return $this;
+    }
+
+    public function getTrade(): ?Trade
+    {
+        return $this->trade;
+    }
+
+    public function setTrade(Trade $trade): self
+    {
+        $this->trade = $trade;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $trade->getPayLog()) {
+            $trade->setPayLog($this);
+        }
 
         return $this;
     }

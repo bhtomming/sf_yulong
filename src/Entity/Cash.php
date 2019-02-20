@@ -36,10 +36,7 @@ class Cash
      */
     private $status;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $checker;
+
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -50,6 +47,16 @@ class Cash
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $checkTime;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="cashLog")
+     */
+    private $member;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="checkCashLog", cascade={"persist", "remove"})
+     */
+    private $checker;
 
     public function getId(): ?int
     {
@@ -104,17 +111,6 @@ class Cash
         return $this;
     }
 
-    public function getChecker(): ?int
-    {
-        return $this->checker;
-    }
-
-    public function setChecker(int $checker): self
-    {
-        $this->checker = $checker;
-
-        return $this;
-    }
 
     public function getCheckContent(): ?string
     {
@@ -136,6 +132,36 @@ class Cash
     public function setCheckTime(?\DateTimeInterface $checkTime): self
     {
         $this->checkTime = $checkTime;
+
+        return $this;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): self
+    {
+        $this->member = $member;
+
+        return $this;
+    }
+
+    public function getChecker(): ?User
+    {
+        return $this->checker;
+    }
+
+    public function setChecker(?User $user): self
+    {
+        $this->checker = $user;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newCheckCashLog = $user === null ? null : $this;
+        if ($newCheckCashLog !== $user->getCheckCashLog()) {
+            $user->setCheckCashLog($newCheckCashLog);
+        }
 
         return $this;
     }

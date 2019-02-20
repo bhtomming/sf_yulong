@@ -121,6 +121,11 @@ class Goods
      */
     private $downTime;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="goods")
+     */
+    private $category;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -374,6 +379,18 @@ class Goods
     public function setDownTime(?\DateTimeInterface $downTime): self
     {
         $this->downTime = $downTime;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

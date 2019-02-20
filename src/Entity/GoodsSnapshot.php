@@ -51,6 +51,12 @@ class GoodsSnapshot
      */
     private $goodsLink;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Trade", inversedBy="goodsSnapshot")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $trade;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -136,6 +142,18 @@ class GoodsSnapshot
     public function setGoodsLink(?string $goodsLink): self
     {
         $this->goodsLink = $goodsLink;
+
+        return $this;
+    }
+
+    public function getTrade(): ?Trade
+    {
+        return $this->trade;
+    }
+
+    public function setTrade(?Trade $trade): self
+    {
+        $this->trade = $trade;
 
         return $this;
     }
