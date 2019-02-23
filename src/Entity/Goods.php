@@ -31,10 +31,7 @@ class Goods
      */
     private $summary;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $categoryId;
+
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -126,6 +123,11 @@ class Goods
      */
     private $category;
 
+    public function __construct()
+    {
+        $this->setCreatedTime(new \DateTime('now'));
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -167,17 +169,6 @@ class Goods
         return $this;
     }
 
-    public function getCategoryId(): ?int
-    {
-        return $this->categoryId;
-    }
-
-    public function setCategoryId(int $categoryId): self
-    {
-        $this->categoryId = $categoryId;
-
-        return $this;
-    }
 
     public function getTitleImg(): ?string
     {
