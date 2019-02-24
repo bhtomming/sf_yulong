@@ -25,11 +25,6 @@ class Trade
 
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $goodsId;
-
-    /**
      * @ORM\Column(type="float")
      */
     private $totalAmount;
@@ -87,41 +82,8 @@ class Trade
         return $this;
     }
 
-    public function getMbId(): ?int
-    {
-        return $this->mbId;
-    }
 
-    public function setMbId(int $mbId): self
-    {
-        $this->mbId = $mbId;
 
-        return $this;
-    }
-
-    public function getPayId(): ?int
-    {
-        return $this->payId;
-    }
-
-    public function setPayId(?int $payId): self
-    {
-        $this->payId = $payId;
-
-        return $this;
-    }
-
-    public function getGoodsId(): ?int
-    {
-        return $this->goodsId;
-    }
-
-    public function setGoodsId(int $goodsId): self
-    {
-        $this->goodsId = $goodsId;
-
-        return $this;
-    }
 
     public function getTotalAmount(): ?float
     {

@@ -10,15 +10,26 @@
 namespace App\Admin;
 
 
+use App\Entity\Member;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class CashAdmin extends AbstractAdmin
 {
     public function configureListFields(ListMapper $list)
     {
+        $list->add('amount',null,['label'=>'金额'])
+            ->add('member',EntityType::class,
+                [
+                    'class'=>Member::class,
+                    'label'=>'会员',
+                    'choice_label'=>'id'
+                ])
+            ->add('createdTime',null,['label'=>'申请时间'])
+        ;
 
     }
 
@@ -31,5 +42,7 @@ class CashAdmin extends AbstractAdmin
     {
 
     }
+
+
 
 }

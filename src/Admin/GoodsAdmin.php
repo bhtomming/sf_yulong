@@ -61,7 +61,7 @@ final class GoodsAdmin extends AbstractAdmin
             return null;
         }
         if($goods->getSaling()){
-            $goods->setPublishTime(new \DateTime('now'));
+            $goods->setPublishTime(new \Date('now'));
         }
 
         return parent::create($goods);

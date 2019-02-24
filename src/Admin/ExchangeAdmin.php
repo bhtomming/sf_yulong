@@ -19,6 +19,11 @@ class ExchangeAdmin extends AbstractAdmin
 {
     public function configureListFields(ListMapper $list)
     {
+        $list->add('id',null,['label'=>'ID标识'])
+            ->add('amount',null,['label'=>'充值金额'])
+            ->add('status',null,['label'=>'状态'])
+            ->add('createTime',null,['label'=>'充值时间'])
+        ;
 
     }
 

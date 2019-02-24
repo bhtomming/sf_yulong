@@ -16,10 +16,7 @@ class Cash
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $mbId;
+
 
     /**
      * @ORM\Column(type="decimal", precision=10, scale=2)
@@ -63,17 +60,7 @@ class Cash
         return $this->id;
     }
 
-    public function getMbId(): ?int
-    {
-        return $this->mbId;
-    }
 
-    public function setMbId(int $mbId): self
-    {
-        $this->mbId = $mbId;
-
-        return $this;
-    }
 
     public function getAmount()
     {
