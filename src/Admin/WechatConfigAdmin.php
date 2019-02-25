@@ -28,6 +28,11 @@ class WechatConfigAdmin extends AbstractAdmin
 
     public function configureFormFields(FormMapper $form)
     {
+        $form->add('appid',null,['label'=>'appid'])
+            ->add('appscret',null,['label'=>'appscret'])
+            ->add('token',null,['label'=>'token'])
+            ->add('reply',null,['label'=>'关注回复'])
+        ;
 
     }
 

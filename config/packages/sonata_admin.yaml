@@ -1,8 +1,9 @@
 sonata_admin:
-    title: 'Sonata Admin'
+    title: '助派管理系统'
     dashboard:
         blocks:
             - { type: sonata.admin.block.admin_list, position: left }
+
 
 sonata_block:
     blocks:

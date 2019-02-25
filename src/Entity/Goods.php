@@ -126,6 +126,7 @@ class Goods
     public function __construct()
     {
         $this->setCreatedTime(new \DateTime('now'));
+        $this->setSale(0);
     }
 
     public function getId(): ?int

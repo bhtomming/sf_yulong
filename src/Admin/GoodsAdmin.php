@@ -19,12 +19,13 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 final class GoodsAdmin extends AbstractAdmin
 {
     public function configureListFields(ListMapper $list)
     {
-        $list->add('name',null,['label'=>'名称'])
+        $list->addIdentifier('name',null,['label'=>'名称'])
             ->add('price',null,['label'=>'价格'])
         ;
     }
@@ -34,11 +35,15 @@ final class GoodsAdmin extends AbstractAdmin
         $form->add('name',null,['label'=>'商品名称'])
             ->add('price',null,['label'=>'价格'])
             ->add('titleImg',null,['label'=>'标题图片'])
+            //->add('voide',FileType::class,['label'=>'视频'])
             ->add('stock',null,['label'=>'库存'])
             ->add('isFront',null,['label'=>'上首页'])
             ->add('hot',null,['label'=>'热销'])
+            ->add('active',null,['label'=>'促销'])
             ->add('sorter',null,['label'=>'排序'])
+            ->add('discountPrice',null,['label'=>'优惠价'])
             ->add('saling',null,['label'=>'是否上架'])
+            ->add('pointExchange',null,['label'=>'是否可兑换'])
             ->add('summary',null,['label'=>'简介'])
             ->add('category',EntityType::class,[
                 'class'=>Category::class,
@@ -55,16 +60,16 @@ final class GoodsAdmin extends AbstractAdmin
         ;
     }
 
-    public function create($goods)
+    public function preCreate($goods)
     {
         if(! $goods instanceof Goods){
             return null;
         }
         if($goods->getSaling()){
-            $goods->setPublishTime(new \Date('now'));
+            $goods->setPublishTime(new \DateTime('now'));
         }
 
-        return parent::create($goods);
+        return $goods;
     }
 
 
