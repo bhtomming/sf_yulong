@@ -4,9 +4,12 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 
 
 /**
+ * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 final class User implements UserInterface
@@ -36,6 +39,7 @@ final class User implements UserInterface
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Member", inversedBy="user", cascade={"persist", "remove"})
+     * @ApiSubresource
      */
     private $member;
 

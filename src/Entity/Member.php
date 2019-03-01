@@ -5,8 +5,10 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
+ * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\MemberRepository")
  */
 class Member
@@ -240,8 +242,8 @@ class Member
 
         // set (or unset) the owning side of the relation if necessary
         $newMember = $user === null ? null : $this;
-        if ($newMember !== $user->member()) {
-            $user->member($newMember);
+        if ($newMember !== $user->getMember()) {
+            $user->setMember($newMember);
         }
 
         return $this;

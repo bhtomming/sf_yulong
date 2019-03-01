@@ -1,4 +1,16 @@
 {
+    "api-platform/api-pack": {
+        "version": "v1.2.0"
+    },
+    "api-platform/core": {
+        "version": "2.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "2.1",
+            "ref": "18727d8f229306860b46955f438e1897421da689"
+        }
+    },
     "cocur/slugify": {
         "version": "v3.2"
     },
@@ -77,6 +89,15 @@
     "knplabs/knp-menu-bundle": {
         "version": "v2.2.1"
     },
+    "nelmio/cors-bundle": {
+        "version": "1.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.5",
+            "ref": "f0436fc35fca88eada758311f8de43bfb61f1980"
+        }
+    },
     "nikic/php-parser": {
         "version": "v4.2.1"
     },
@@ -85,6 +106,15 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.2"
+    },
+    "phpdocumentor/reflection-common": {
+        "version": "1.0.1"
+    },
+    "phpdocumentor/reflection-docblock": {
+        "version": "4.3.0"
+    },
+    "phpdocumentor/type-resolver": {
+        "version": "0.4.0"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -248,6 +278,9 @@
     "symfony/property-access": {
         "version": "v4.2.3"
     },
+    "symfony/property-info": {
+        "version": "v4.2.3"
+    },
     "symfony/routing": {
         "version": "4.2",
         "recipe": {
@@ -279,6 +312,9 @@
         "version": "v4.2.3"
     },
     "symfony/security-http": {
+        "version": "v4.2.3"
+    },
+    "symfony/serializer": {
         "version": "v4.2.3"
     },
     "symfony/stopwatch": {
@@ -343,6 +379,12 @@
     },
     "twig/twig": {
         "version": "v2.6.2"
+    },
+    "webmozart/assert": {
+        "version": "1.4.0"
+    },
+    "willdurand/negotiation": {
+        "version": "v2.3.1"
     },
     "zendframework/zend-code": {
         "version": "3.3.1"
