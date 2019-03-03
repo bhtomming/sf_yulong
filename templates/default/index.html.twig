@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block body %}
-
     <div class="content">
         <div class="swiper-container" data-space-between="0" data-autoplay="5000">
             <div class="swiper-wrapper">
@@ -16,6 +15,100 @@
                 <div class="swiper-slide"><img src="{{ asset('build/images/sw3.jpg') }}" width="100%" /> </div>
             </div>
             <div class="swiper-pagination"></div>
+        </div>
+        <div class="content-padded">
+            <!--搜索框-->
+            <div class="searchbar">
+                <div class="search-input">
+                    <label class="icon icon-search" for="search"></label>
+                    <input type="search" id='search' placeholder='在商城内搜索...'/>
+                </div>
+            </div>
+            <!--搜索框/-->
+        </div>
+        <!--栏目-->
+        <div id="nav" class="row">
+            <div class="col-25">
+                <a href="category.php?id=1">
+                    <img alt="玉泷地产" src="http://bhyulong.cn/images/upload/bh_dichan_icon.png" width="100%">
+                </a>
+            </div>
+            <div class="col-25">
+                <a href="category.php?id=2">
+                    <img alt="玉泷酒店" src="http://bhyulong.cn/images/upload/bh_yuetu_icon.png" width="100%">
+                </a>
+            </div>
+            <div class="col-25">
+                <a href="category.php?id=3">
+                    <img alt="玉泷农业" src="http://bhyulong.cn/images/upload/bh_nongye_icon.png" width="100%">
+                </a>
+            </div>
+            <div class="col-25">
+                <a href="category.php?id=4">
+                    <img alt="玉泷科技" src="http://bhyulong.cn/images/upload/bh_keji_icon.png" width="100%">
+                </a>
+            </div>
+
+        </div>
+        <!--栏目/-->
+        <div class="bg2"></div>
+        <div class="index-goods-container">
+            <h4 class="cate-title">酒店订房</h4>
+            <div class="second-title"><a class="pull-right" href="category.php?id=2">查看更多 &gt; </a><span class="blue-text">玉泷悦途<sub>HOTEL RESERVATION</sub></span></div>
+            <div class="row  no-gutter">
+                <div class="col-50 index-goods-list">
+                    <div class="card demo-card-header-pic">
+                        <div valign="bottom" class="card-header color-white no-border no-padding">
+                            <img class='card-cover' src="http://bhyulong.cn/images/201901/thumb_img/48_thumb_G_1546921626593.jpg" alt="">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-content-inner">
+                                <p class="color-gray">商品名称</p>
+                                <p>价格<span class="pull-right">购物车</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-50 index-goods-list">
+                    <div class="card demo-card-header-pic">
+                        <div valign="bottom" class="card-header color-white no-border no-padding">
+                            <img class='card-cover' src="http://bhyulong.cn/images/201901/thumb_img/48_thumb_G_1546921626593.jpg" alt="">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-content-inner">
+                                <p class="color-gray">商品名称</p>
+                                <p>价格<span class="pull-right">购物车</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-50 index-goods-list">
+                    <div class="card demo-card-header-pic">
+                        <div valign="bottom" class="card-header color-white no-border no-padding">
+                            <img class='card-cover' src="http://bhyulong.cn/images/201901/thumb_img/48_thumb_G_1546921626593.jpg" alt="">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-content-inner">
+                                <p class="color-gray">商品名称</p>
+                                <p>价格<span class="pull-right">购物车</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-50 index-goods-list">
+                    <div class="card demo-card-header-pic">
+                        <div valign="bottom" class="card-header color-white no-border no-padding">
+                            <img class='card-cover' src="http://bhyulong.cn/images/201901/thumb_img/48_thumb_G_1546921626593.jpg" alt="">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-content-inner">
+                                <p class="color-gray">商品名称</p>
+                                <p>价格<span class="pull-right">购物车</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

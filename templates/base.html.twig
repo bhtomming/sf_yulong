@@ -8,9 +8,11 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
 {% block stylesheets %}
     <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
     <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+    {{ encore_entry_link_tags("app") }}
 {% endblock %}
 </head>
 <body>
@@ -41,10 +43,11 @@
             </a>
         </nav>
     {% endblock %}
-</div>
+    </div>
     {% block javascripts %}
         <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.js' charset='utf-8'></script>
         <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.js' charset='utf-8'></script>
+        {{ encore_entry_script_tags("app") }}
     {% endblock %}
     <script>
         $.init();

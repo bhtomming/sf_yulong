@@ -1,25 +1,85 @@
-body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td { margin:0; padding:0; }
-body, button, input, select, textarea { font:12px/1.5tahoma, arial, \5b8b\4f53; }
-h1, h2, h3, h4, h5, h6{ font-size:100%; }
-address, cite, dfn, em, var { font-style:normal; }
-code, kbd, pre, samp { font-family:couriernew, courier, monospace; }
-small{ font-size:12px; }
-ul, ol { list-style:none; }
-a { text-decoration:none; }
-a:hover { text-decoration:underline; }
-sup { vertical-align:text-top; }
-sub{ vertical-align:text-bottom; }
-legend { color:#000; }
-fieldset, img { border:0; }
-button, input, select, textarea { font-size:100%; }
-table { border-collapse:collapse; border-spacing:0; }
-
 html,body {
     background-color: lightgray;
-    width: 750px;
-    margin: 0 auto;
 }
 header .swiper-container{
     width: 750px;
     height: 398px;
+}
+.swiper-container-horizontal>.swiper-pagination{
+    bottom: 1.5rem;
+}
+.swiper-container{
+    padding-bottom: 5px;
+}
+.searchbar{
+    height: 2.5rem;
+}
+#search{
+    text-align: center;
+    line-height: 2rem;
+    height: 2rem;
+    border-radius: 0.8rem;
+}
+.search-input .icon {
+    left: 13rem;
+}
+
+/********栏目样式*********/
+#nav {
+    padding: 1rem 0.5rem;
+    width: 99%;
+    margin: 1.2rem auto;
+    background-color: #98aab4;
+    border-radius: 25px;
+}
+#nav a {
+    display: block;
+    width: 100%;
+    color: #666;
+    /* padding: 0.1rem 1%; */
+    text-align: center;
+    font-size: 0.9rem;
+}
+.bg2 {
+    display: block;
+    margin: 0.5rem 0;
+    height: 0.2rem;
+    background: #dfdfdf;
+}
+
+
+/********首页展现****************/
+.cate-title {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #cb544e;
+    width: 6rem;
+    margin: 0 auto;
+    padding: 0.26rem 0;
+    border: 2px solid #beccd5;
+    box-shadow: -5px 5px 5px #c1c2c4;
+}
+.second-title {
+    font-size: 0.9rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    margin: 0.5rem 2% 0.5rem 0;
+}
+.second-title .blue-text {
+    color: #495682;
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+.blue-text sub {
+    font-size: .5rem;
+    margin-left: .5rem;
+}
+
+.index-goods-list .card{
+    border-radius: 0.5rem;
+}
+.index-goods-list .card img{
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
 }
