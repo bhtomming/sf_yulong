@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+    <header class="bar bar-nav">
+        <h1 class="title">热卖商品</h1>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div class="content-padded">
+            <div class="row">
+                <div class="col-100 searchbar">
+                    <a class="searchbar-cancel">取消</a>
+                    <div class="search-input">
+                        <label class="icon icon-search" for="search"></label>
+                        <input type="search" id="search" placeholder="输入关键字...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons-tab">
+            <a href="#tab1" class="tab-link button active">综合</a>
+            <a href="#tab2" class="tab-link button">人气</a>
+            <a href="#tab3" class="tab-link button">销量</a>
+            <a href="#tab4" class="tab-link button">价格</a>
+        </div>
+        <div class="tabs">
+            <div id="tab1" class="tab active">
+                <div class="content-block">
+                    综合排序
+                </div>
+            </div>
+            <div id="tab2" class="tab">
+                <div class="content-block">
+                    <p>按人气排序</p>
+                </div>
+            </div>
+            <div id="tab3" class="tab">
+                <div class="content-block">
+                    <p>按销量排序</p>
+                </div>
+            </div>
+            <div id="tab4" class="tab">
+                <div class="content-block">
+                    <p>按价格排序</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

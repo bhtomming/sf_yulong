@@ -32,7 +32,7 @@ class DefaultController extends AbstractController
      */
     public function hotSales()
     {
-
+        return $this->render('default/hot.html.twig');
     }
 
 
@@ -60,6 +60,14 @@ class DefaultController extends AbstractController
      * @Route("/cart/add/", name="add_cart")
      */
     public function addCart()
+    {
+
+    }
+
+    /**
+     * @Route("/recommend/", name="recommend")
+     */
+    public function recommend()
     {
 
     }

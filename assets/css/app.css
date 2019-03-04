@@ -6,7 +6,7 @@ header .swiper-container{
     height: 398px;
 }
 .swiper-container-horizontal>.swiper-pagination{
-    bottom: 1.5rem;
+    bottom: 0;
 }
 .swiper-container{
     padding-bottom: 5px;
@@ -21,7 +21,7 @@ header .swiper-container{
     border-radius: 0.8rem;
 }
 .search-input .icon {
-    left: 13rem;
+    left: 5.5rem;
 }
 
 /********栏目样式*********/
@@ -51,7 +51,7 @@ header .swiper-container{
 /********首页展现****************/
 .cate-title {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     color: #cb544e;
     width: 6rem;
     margin: 0 auto;
@@ -60,9 +60,9 @@ header .swiper-container{
     box-shadow: -5px 5px 5px #c1c2c4;
 }
 .second-title {
-    font-size: 0.9rem;
-    height: 2.5rem;
-    line-height: 2.5rem;
+    font-size: 0.8rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
     margin: 0.5rem 2% 0.5rem 0;
 }
 .second-title .blue-text {
@@ -78,8 +78,14 @@ header .swiper-container{
 
 .index-goods-list .card{
     border-radius: 0.5rem;
+    margin: 0.25rem;
 }
+
 .index-goods-list .card img{
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+}
+.index-goods-container .row{
+    width: 98%;
+    margin: 0 auto;
 }

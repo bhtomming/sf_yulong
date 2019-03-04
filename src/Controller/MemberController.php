@@ -16,18 +16,18 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class MemberController
  * @package App\Controller
- * @Route("/member", name="member_center")
+ * @Route("/member")
  */
 
 class MemberController extends AbstractController
 {
 
     /**
-     * @Route("/", name="member_index")
+     * @Route("/", name="member_center")
      */
     public function index()
     {
-
+        return $this->render("member/index.html.twig");
     }
 
     /**
