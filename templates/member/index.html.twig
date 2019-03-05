@@ -10,7 +10,7 @@
     <div class="content">
         <div class="card member-card-header-pic">
             <div class="card-content">
-                <div class="card-content-inner">
+                <div class="card-content-inner member-inner">
                     <div class="list-block media-list">
                         <ul>
                             <li class="item-content">
@@ -29,34 +29,37 @@
             </div>
             <div class="card-footer">
                 <div class="buttons-tab member-tabs">
-                    <a href="#tab1" class="tab-link button">订单</a>
-                    <a href="#tab2" class="tab-link button">积分</a>
-                    <a href="#tab3" class="tab-link button">余额</a>
-                    <a href="#tab4" class="tab-link button">红包</a>
+                    <a href="#tab1" class="tab-link button"><span class="fa fa-clipboard-list"></span>订单</a>
+                    <a href="#tab2" class="tab-link button"><span class="fa fa-coins"></span>积分</a>
+                    <a href="#tab3" class="tab-link button"><span class="fa fa-money-check-alt"></span>余额</a>
+                    <a href="#tab4" class="tab-link button"><span class="fa fa-gift"></span>红包</a>
                 </div>
             </div>
         </div>
-        <div class="tabs">
-            <div id="tab1" class="tab active">
-                <div class="content-block">
-                    <span class="icon ballot-check"></span>
+        <div class="member-content">
+            <div class="tabs">
+                <div id="tab1" class="tab">
+                    <div class="content-block">
+                        我的订单
+                    </div>
                 </div>
-            </div>
-            <div id="tab2" class="tab">
-                <div class="content-block">
-                    <p>按人气排序</p>
+                <div id="tab2" class="tab">
+                    <div class="content-block">
+                        <p>按人气排序</p>
+                    </div>
                 </div>
-            </div>
-            <div id="tab3" class="tab">
-                <div class="content-block">
-                    <p>按销量排序</p>
+                <div id="tab3" class="tab">
+                    <div class="content-block">
+                        <p>按销量排序</p>
+                    </div>
                 </div>
-            </div>
-            <div id="tab4" class="tab">
-                <div class="content-block">
-                    <p>按价格排序</p>
+                <div id="tab4" class="tab">
+                    <div class="content-block">
+                        <p>按价格排序</p>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="account"></div>
     </div>
 {% endblock %}

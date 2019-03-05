@@ -23,6 +23,19 @@ class DefaultController extends AbstractController
      */
     public function index()
     {
+        $em = $this->getDoctrine()->getManager();
+
+        $categoryHotel = $em->getRepository(Category::class)->find(1);
+        $categoryHouse = $em->getRepository(Category::class)->find(2);
+        $categoryTenycal = $em->getRepository(Category::class)->find(3);
+        $categoryCuntry = $em->getRepository(Category::class)->find(4);
+
+        $hotels = $categoryHotel->getGoods();
+        $housies = $categoryHouse->getGoods();
+        $tenycals = $categoryTenycal->getGoods();
+        $contries = $categoryCuntry->getGoods();
+
+
         return $this->render('default/index.html.twig');
     }
 
@@ -32,6 +45,11 @@ class DefaultController extends AbstractController
      */
     public function hotSales()
     {
+        $em = $this->getDoctrine()->getManager();
+        $goodses = $em->getRepository(Goods::class)->findBy([
+            'sale'=> 'DESC',
+            'order'=> 'DESC',
+        ]);
         return $this->render('default/hot.html.twig');
     }
 
@@ -42,7 +60,7 @@ class DefaultController extends AbstractController
      */
     public function goodsList(Category $category)
     {
-        return $this->render("default/category.html.twig");
+        return $this->render("default/category.html.twig",['category' => $category]);
     }
 
 
@@ -52,14 +70,15 @@ class DefaultController extends AbstractController
      */
     public function goodsShow(Goods $goods)
     {
-        return $this->render("default/show.html.twig");
+        return $this->render("default/show.html.twig",['goods' => $goods]);
     }
 
 
     /**
-     * @Route("/cart/add/", name="add_cart")
+     * @Route("/cart/add/{goods_id}/{num}", name="add_cart")
+     * @ParamConverter("goods", options={"mapping"={"id"="goods_id"}})
      */
-    public function addCart()
+    public function addCart($goods, $num)
     {
         return $this->render("default/cart.html.twig");
     }

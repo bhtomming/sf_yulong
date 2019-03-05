@@ -95,16 +95,39 @@ header .swiper-container{
 .member-card-header-pic{
     background: url("http://www.bhyulong.cn/themes/tianxin100/images/top_bj.jpg") center no-repeat;
 }
+.member-inner{
+    padding: 2rem .75rem;
+}
 div.member-tabs{
     background: transparent;
-    height: 3rem;
+    width: 100%;
+}
+div.member-tabs::after{
+    content: none;
 }
 div.member-tabs .tab-link.button{
     text-align: center;
     color: #fff;
+    border: none;
+}
+div.member-tabs .tab-link.button.active{
+    color: #0F83E8;
 }
 .tab-link .fa{
     display: block;
     font-size: 1.2rem;
     line-height: 0.8rem;
+}
+.account{
+    height: 5rem;
+    background: #0F83E8;
+}
+.member-content{
+    position: relative;
+}
+.member-content .tabs{
+    position: absolute;
+    z-index: 10;
+    background: #8B2BB9;
+    width: 100%;
 }
