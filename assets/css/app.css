@@ -1,3 +1,4 @@
+@import "~@fortawesome/fontawesome-free/css/all.css";
 html,body {
     background-color: lightgray;
 }
@@ -88,4 +89,22 @@ header .swiper-container{
 .index-goods-container .row{
     width: 98%;
     margin: 0 auto;
+}
+
+/*************会员中心****************/
+.member-card-header-pic{
+    background: url("http://www.bhyulong.cn/themes/tianxin100/images/top_bj.jpg") center no-repeat;
+}
+div.member-tabs{
+    background: transparent;
+    height: 3rem;
+}
+div.member-tabs .tab-link.button{
+    text-align: center;
+    color: #fff;
+}
+.tab-link .fa{
+    display: block;
+    font-size: 1.2rem;
+    line-height: 0.8rem;
 }

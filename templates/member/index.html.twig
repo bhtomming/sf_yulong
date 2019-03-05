@@ -5,3 +5,58 @@
         <h1 class="title">会员中心</h1>
     </header>
 {% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div class="card member-card-header-pic">
+            <div class="card-content">
+                <div class="card-content-inner">
+                    <div class="list-block media-list">
+                        <ul>
+                            <li class="item-content">
+                                <div class="item-media">
+                                    <img src="http://www.bhyulong.cn/themes/tianxin100/images/photo.png" width="72">
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-subtitle color-while">会员ID</div>
+                                    <div class="item-subtitle">微信昵称</div>
+                                    <div class="item-subtitle">关注时间</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="buttons-tab member-tabs">
+                    <a href="#tab1" class="tab-link button">订单</a>
+                    <a href="#tab2" class="tab-link button">积分</a>
+                    <a href="#tab3" class="tab-link button">余额</a>
+                    <a href="#tab4" class="tab-link button">红包</a>
+                </div>
+            </div>
+        </div>
+        <div class="tabs">
+            <div id="tab1" class="tab active">
+                <div class="content-block">
+                    <span class="icon ballot-check"></span>
+                </div>
+            </div>
+            <div id="tab2" class="tab">
+                <div class="content-block">
+                    <p>按人气排序</p>
+                </div>
+            </div>
+            <div id="tab3" class="tab">
+                <div class="content-block">
+                    <p>按销量排序</p>
+                </div>
+            </div>
+            <div id="tab4" class="tab">
+                <div class="content-block">
+                    <p>按价格排序</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

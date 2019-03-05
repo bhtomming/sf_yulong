@@ -42,7 +42,7 @@ class DefaultController extends AbstractController
      */
     public function goodsList(Category $category)
     {
-
+        return $this->render("default/category.html.twig");
     }
 
 
@@ -52,7 +52,7 @@ class DefaultController extends AbstractController
      */
     public function goodsShow(Goods $goods)
     {
-
+        return $this->render("default/show.html.twig");
     }
 
 
@@ -61,7 +61,7 @@ class DefaultController extends AbstractController
      */
     public function addCart()
     {
-
+        return $this->render("default/cart.html.twig");
     }
 
     /**
@@ -69,7 +69,7 @@ class DefaultController extends AbstractController
      */
     public function recommend()
     {
-
+        return $this->render("default/recommend.html.twig");
     }
 
 }
