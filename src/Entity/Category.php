@@ -154,4 +154,17 @@ class Category
 
         return $this;
     }
+
+    public function getGoodsBySort()
+    {
+        $goodses = $this->getGoods();
+        $goodsArr = $goodses->toArray();
+        usort($goodsArr,'self::cmp');
+        return $goodsArr;
+    }
+
+     private function cmp($a, $b)
+    {
+        return $a->getSorter() > $b->getSorter() ? 1 : -1;
+    }
 }

@@ -12,6 +12,8 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Entity\Goods;
+use App\Entity\GoodsSnapshot;
+use App\Entity\Trade;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -26,17 +28,11 @@ class DefaultController extends AbstractController
         $em = $this->getDoctrine()->getManager();
 
         $categoryHotel = $em->getRepository(Category::class)->find(1);
-        $categoryHouse = $em->getRepository(Category::class)->find(2);
-        $categoryTenycal = $em->getRepository(Category::class)->find(3);
-        $categoryCuntry = $em->getRepository(Category::class)->find(4);
 
-        $hotels = $categoryHotel->getGoods();
-        $housies = $categoryHouse->getGoods();
-        $tenycals = $categoryTenycal->getGoods();
-        $contries = $categoryCuntry->getGoods();
+        $hts = $categoryHotel->getGoodsBySort();
 
 
-        return $this->render('default/index.html.twig');
+        return $this->render('default/index.html.twig',['hts' => $hts]);
     }
 
 
@@ -89,6 +85,33 @@ class DefaultController extends AbstractController
     public function recommend()
     {
         return $this->render("default/recommend.html.twig");
+    }
+
+    /**
+     * @Route("/order/add", name="add_order")
+     * 下订单,生成订单
+     */
+    public function addOrder()
+    {
+        $user = $this->getUser();
+        if(!($user instanceof User)){
+            return $this->createAccessDeniedException(['你无权访问']);
+        }
+        $member = $user->getMember();
+        $carts = $member->getCart();
+        $trade = new Trade();
+        foreach ($carts as $cart){
+            $goodsSnapshot = new GoodsSnapshot();
+            $goods = $cart->getGoods();
+            $goodsSnapshot->setGoodsId($goods->getId());
+            $goodsSnapshot->setGoodsName($goods->getName());
+            $goodsSnapshot->getGoodsImg($goods->getGoodsImg);
+            $goodsSnapshot->setGoodsNum($cart->getNum());
+            $goodsSnapshot->setGoodsPrice($goods->getPrice());
+            $goodsSnapshot->setGoodsLink("goods/show/".$goods->getId());
+        }
+
+
     }
 
 }

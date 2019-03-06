@@ -116,6 +116,13 @@ class Member
      */
     private $pointsLog;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Cart", mappedBy="member", orphanRemoval=true)
+     */
+    private $carts;
+
+
+
     public function __construct()
     {
         $this->payLog = new ArrayCollection();
@@ -127,6 +134,7 @@ class Member
         $this->assess = new ArrayCollection();
         $this->replies = new ArrayCollection();
         $this->pointsLog = new ArrayCollection();
+        $this->carts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -539,4 +547,37 @@ class Member
 
         return $this;
     }
+
+    /**
+     * @return Collection|Cart[]
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): self
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts[] = $cart;
+            $cart->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): self
+    {
+        if ($this->carts->contains($cart)) {
+            $this->carts->removeElement($cart);
+            // set the owning side to null (unless already changed)
+            if ($cart->getMember() === $this) {
+                $cart->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }
