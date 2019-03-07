@@ -17,11 +17,6 @@ class PointsLog
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $mbId;
-
-    /**
      * @ORM\Column(type="decimal", precision=12, scale=2)
      */
     private $points;
@@ -46,22 +41,16 @@ class PointsLog
      */
     private $member;
 
+    public function __construct()
+    {
+        $this->setChangeTime(new \DateTime('now'));
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getMbId(): ?int
-    {
-        return $this->mbId;
-    }
-
-    public function setMbId(int $mbId): self
-    {
-        $this->mbId = $mbId;
-
-        return $this;
-    }
 
     public function getPoints()
     {

@@ -137,6 +137,11 @@ class Member
         $this->carts = new ArrayCollection();
     }
 
+    public function hasParent()
+    {
+        return $this->parent ? true : false;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -163,6 +168,18 @@ class Member
     public function setPoints($points): self
     {
         $this->points = $points;
+
+        return $this;
+    }
+
+    public function addPoints($points,$reason): self
+    {
+        $pointsLog = new PointsLog();
+        $pointsLog->setPoints($points)
+            ->setChangeReason($reason);
+        $this->addPointsLog($pointsLog);
+
+        $this->points += $points;
 
         return $this;
     }

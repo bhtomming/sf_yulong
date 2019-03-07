@@ -11,6 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Trade
 {
+    const UNPAY = 0;
+    const PAIED = 1;
+    const CLOSE = 2;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -63,6 +67,22 @@ class Trade
     public function __construct()
     {
         $this->goodsSnapshot = new ArrayCollection();
+        mt_srand((double) microtime() * 1000000);
+        $this->tradeNo = date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+        $this->status = self::UNPAY;
+        $dateTime = new \DateTime('now');
+        $dateTime->modify("+30 minute");
+        $this->setExamineTime($dateTime);
+    }
+
+    public function getWePayInfo()
+    {
+        return array(
+            'out_trade_no' => time(),
+            'total_fee' => $this->totalAmount * 100, // 订单金额**单位：分**
+            'body' => '支付'.$this->tradeNo,
+            'openid' => 'onkVf1FjWS5SBIixxxxxxx',
+        );
     }
 
     public function getId(): ?int

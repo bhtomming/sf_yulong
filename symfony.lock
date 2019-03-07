@@ -80,6 +80,15 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.3.3"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.5.2"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
@@ -88,6 +97,9 @@
     },
     "knplabs/knp-menu-bundle": {
         "version": "v2.2.1"
+    },
+    "monolog/monolog": {
+        "version": "1.24.0"
     },
     "nelmio/cors-bundle": {
         "version": "1.5",
@@ -122,11 +134,17 @@
     "psr/container": {
         "version": "1.0.0"
     },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/log": {
         "version": "1.1.0"
     },
     "psr/simple-cache": {
         "version": "1.0.1"
+    },
+    "ralouphie/getallheaders": {
+        "version": "2.0.5"
     },
     "sensio/framework-extra-bundle": {
         "version": "5.2",
@@ -408,6 +426,12 @@
     },
     "willdurand/negotiation": {
         "version": "v2.3.1"
+    },
+    "yansongda/pay": {
+        "version": "v2.6.2"
+    },
+    "yansongda/supports": {
+        "version": "v1.8.7"
     },
     "zendframework/zend-code": {
         "version": "3.3.1"

@@ -19,6 +19,16 @@ class GoodsRepository extends ServiceEntityRepository
         parent::__construct($registry, Goods::class);
     }
 
+    public function findByHot()
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.hot = :hot')
+            ->setParameter('hot',true)
+            ->orderBy('g.sorter','ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Goods[] Returns an array of Goods objects
     //  */

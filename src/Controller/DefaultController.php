@@ -10,18 +10,27 @@
 namespace App\Controller;
 
 
+use App\Entity\Cart;
 use App\Entity\Category;
 use App\Entity\Goods;
 use App\Entity\GoodsSnapshot;
+use App\Entity\PayLog;
+use App\Entity\PointsConfig;
+use App\Entity\PointsLog;
 use App\Entity\Trade;
+use App\Entity\User;
+use App\Entity\WechatConfig;
+use App\Servers\MemberManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Yansongda\Pay\Pay;
 
 class DefaultController extends AbstractController
 {
     /**
      * @Route("/",name="home_page")
+     * 网站首页
      */
     public function index()
     {
@@ -31,28 +40,27 @@ class DefaultController extends AbstractController
 
         $hts = $categoryHotel->getGoodsBySort();
 
-
         return $this->render('default/index.html.twig',['hts' => $hts]);
     }
 
 
     /**
      * @Route("/hot", name="hot_sale")
+     * 热销商品页面
      */
     public function hotSales()
     {
         $em = $this->getDoctrine()->getManager();
-        $goodses = $em->getRepository(Goods::class)->findBy([
-            'sale'=> 'DESC',
-            'order'=> 'DESC',
-        ]);
-        return $this->render('default/hot.html.twig');
+        $goodses = $em->getRepository(Goods::class)->findByHot();
+
+        return $this->render('default/hot.html.twig',['goodses' => $goodses]);
     }
 
 
     /**
      * @Route("/list/{id}", name="goods_list")
      * @ParamConverter("category", options={"mapping"={"id"="id"}})
+     * 按分类显示商品
      */
     public function goodsList(Category $category)
     {
@@ -63,6 +71,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/goods/{id}", name="goods_show")
      * @ParamConverter("goods", options={"mapping"={"id"="id"}})
+     * 商品详情页面
      */
     public function goodsShow(Goods $goods)
     {
@@ -74,13 +83,50 @@ class DefaultController extends AbstractController
      * @Route("/cart/add/{goods_id}/{num}", name="add_cart")
      * @ParamConverter("goods", options={"mapping"={"id"="goods_id"}})
      */
-    public function addCart($goods, $num)
+    public function addCart(Goods $goods, $num)
     {
-        return $this->render("default/cart.html.twig");
+        $member = $this->getMemberIfLogin();
+
+        $cart = new Cart();
+        if(!$goods->getSaling()){
+            return $this->createNotFoundException(['该商品已经下架']);
+        }
+        $cart->setGoods($goods);
+        if($num > $goods->getStock()){
+            return $this->createNotFoundException(['该商品库存不足']);
+        }
+        $cart->setNum($num);
+        $member->addCart($cart);
+        return $this->render("default/cart.html.twig",['cart' => $cart]);
+    }
+
+    /**
+     * @Route("/cart/del/{id}/{num}", name="remove_cart")
+     * @ParamConverter("cart", options={"mapping"={"id"="id"}})
+     */
+    public function removeCart(Cart $cart)
+    {
+        $member = $this->getMemberIfLogin();
+        $member->removeCart($cart);
+        return $this->redirectToRoute("list_cart");
+    }
+
+    /**
+     * @Route("/cart/list", name="list_cart")
+     * 购物车列表
+     *
+     */
+    public function listCart()
+    {
+        $member = $this->getMemberIfLogin();
+        $carts = $member->getCarts();
+
+        return $this->render("default/cart_list.html.twig",['carts'=>$carts]);
     }
 
     /**
      * @Route("/recommend/", name="recommend")
+     * 推荐页面
      */
     public function recommend()
     {
@@ -93,25 +139,112 @@ class DefaultController extends AbstractController
      */
     public function addOrder()
     {
-        $user = $this->getUser();
-        if(!($user instanceof User)){
-            return $this->createAccessDeniedException(['你无权访问']);
-        }
-        $member = $user->getMember();
-        $carts = $member->getCart();
+        $member = $this->getMemberIfLogin();
+        $carts = $member->getCarts();
+        //创建订单
         $trade = new Trade();
+
+        $em = $this->getDoctrine()->getManager();
+        $pointsConfig = $em->getRepository(PointsConfig::class)->find(1);
+        $pointRest = $pointsConfig->getPayPoint() / 100;
+        $points = 0;
+        $amount = 0;
+        //添加订单商品，形成商品快照
         foreach ($carts as $cart){
             $goodsSnapshot = new GoodsSnapshot();
             $goods = $cart->getGoods();
+            $num = $cart->getNum();
+            $price = $goods->getPrice();
+            $amount += $price * $num;
+            $points += $price * $pointRest * $num;
             $goodsSnapshot->setGoodsId($goods->getId());
             $goodsSnapshot->setGoodsName($goods->getName());
             $goodsSnapshot->getGoodsImg($goods->getGoodsImg);
-            $goodsSnapshot->setGoodsNum($cart->getNum());
-            $goodsSnapshot->setGoodsPrice($goods->getPrice());
+            $goodsSnapshot->setGoodsNum($num);
+            $goodsSnapshot->setGoodsPrice($price);
             $goodsSnapshot->setGoodsLink("goods/show/".$goods->getId());
+            $trade->addGoodsSnapshot($goodsSnapshot);
+        }
+        //订单送的积分
+        $trade->setGivePoints($points);
+        //订单总金额
+        $trade->setTotalAmount($amount);
+        $member->addTrade($trade);
+
+        return $this->render('default/show.html.twig',['trade'=>$trade]);
+    }
+
+    /**
+     * @Route("/paying/{id}", name="paying")
+     * 支付页面
+     */
+    public function paying(Trade $trade)
+    {
+        $config = $this->getWechatPayConfig();
+        $pay = Pay::wechat($config)->mp($trade->getWePayInfo());
+    }
+
+    /**
+     * @Route("/respond", name="wx_respond")
+     * 微信支付返回页面
+     */
+    public function respond()
+    {
+        $pay = Pay::wechat($this->getWechatPayConfig());
+
+        try{
+            $data = $pay->verify(); // 是的，验签就这么简单！
+            if($data['return_code'] != 'SUCCESS'){
+                return $this->createNotFoundException(['支付失败']);
+            }
+            $tradeNo = $data['out_trade_no'];
+            $em = $this->getDoctrine()->getManager();
+            $trade = $em->getRepository(Trade::class)->findOneBy(['tradeNo' => $tradeNo]);
+            if(!$trade instanceof Trade){
+                return;
+            }
+            $points = $trade->getGivePoints();
+            $payLog = new PayLog();
+            $trade->setStatus(Trade::PAIED);
+            $member = $trade->getMember();
+
+
+            $payLog->setPoints($points)
+                ->setStatus("微信支付")
+                ->setPayNo($data['transaction_id'])
+                ->setPayTime(new \DateTime('now'))
+                ->setTotalFee($data['cash_fee'])
+                ->setMember($member);
+            $trade->setPayLog($payLog);
+            $memberManager = new MemberManager($em);
+            //分配订单积分
+            $memberManager->distribute($member,$points);
+
+            Log::debug('Wechat notify', $data->all());
+        } catch (\Exception $e) {
+            // $e->getMessage();
         }
 
+        return $pay->success()->send();
 
+    }
+
+    public function getWechatPayConfig()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $wechatConfig = $em->getRepository(WechatConfig::class)->find(1);
+        return $wechatConfig->getPayConfig();
+    }
+
+    public function getMemberIfLogin()
+    {
+        $user = $this->getUser();
+        if(!($user instanceof User)){
+            //用户未登录重定向
+            return $this->redirectToRoute("home_page");
+        }
+        $member = $user->getMember();
+        return $member;
     }
 
 }
