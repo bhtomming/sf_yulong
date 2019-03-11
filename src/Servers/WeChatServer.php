@@ -10,9 +10,11 @@
 namespace App\Servers;
 
 
+use App\Entity\WeChat;
 use App\Entity\WechatConfig;
 use Curl\Curl;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class WeChatServer
 {
@@ -22,11 +24,17 @@ class WeChatServer
 
     private $wechat;
 
-    public function __construct(EntityManagerInterface $em)
+    private $curl;
+
+
+    public function __construct(EntityManagerInterface $em,WeChat $wechat = null)
     {
         $this->em = $em;
         $this->wechatConfig = $this->getWeChatConfig();
+        $this->wechat = $wechat;
+        $this->curl = new Curl();
     }
+
 
     //获取微信配置信息
     public function getWeChatConfig(): ? WechatConfig
@@ -46,10 +54,21 @@ class WeChatServer
 
     }
 
-    //获取微信用户基本信息
-    public function getUserInfo()
+    //创建头像
+    public function createFaceImg(WeChat $weChat)
     {
 
+        return false;
+    }
+
+    //获取微信用户基本信息
+    public function getUserInfo($openId)
+    {
+        $token = $this->getAccessToken();
+        $userInfoUrl = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='.$token.'&openid='.$openId.'&lang=zh_CN';
+        $this->curl->get($userInfoUrl);
+        $userInfo = json_decode($this->curl->getResponse());
+        return $userInfo;
     }
 
     //获取微信用户带参数二维码
@@ -112,7 +131,58 @@ class WeChatServer
     //通过OpenId查找会员
     public function findMemberByOpenId($openId)
     {
+        return $this->em->getRepository(WeChat::class)->findOneBy(['openId'=>$openId]);
+    }
 
+    //用户关注的时候调用
+    public function setSubscribe($openId)
+    {
+        $wechat = new WeChat();
+        $wechat->setOpenid($openId);
+        $wechat->setSubscribe(true);
+        $userInfo = $this->getUserInfo($openId);
+        $wechat
+            ->setNickName($userInfo->nickname)
+            ->setHeadImg($userInfo->headimgurl)
+            ->setCity($userInfo->city)
+            ->setSex($userInfo->sex)
+            ->setProvicne($userInfo->province)
+            ->setCountry($userInfo->country)
+            ->setSubscribeTime($userInfo->subscribe_time)
+            ;
+    }
+
+    public function listenToWechat(Request $request)
+    {
+        $response = $request->getContent();
+        if(empty($response))
+        {
+            return;
+        }
+        $data = simplexml_load_string($request->getContent());
+        $fromUsername = $data -> FromUserName;
+        $msgType = $data -> MsgType;
+        $toUsername = $data -> ToUserName;
+        $keyword = trim($data -> Content);
+
+        //判断是否是事件
+        if($msgType == "event"){
+            $event = $data->Event;
+
+            //判断是否是关注事件
+            if($event == "subscribe"){
+                //获取扫推荐ID
+                $sceneId = substr($data->EventKey,7);
+                if(!empty($sceneId)){
+                    //有推荐人的情况下
+                }
+            }
+            //扫码事件
+            if($event == "SCAN"){
+
+
+            }
+        }
     }
 
 

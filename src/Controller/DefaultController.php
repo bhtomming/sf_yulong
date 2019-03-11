@@ -16,7 +16,6 @@ use App\Entity\Goods;
 use App\Entity\GoodsSnapshot;
 use App\Entity\PayLog;
 use App\Entity\PointsConfig;
-use App\Entity\PointsLog;
 use App\Entity\Trade;
 use App\Entity\User;
 use App\Entity\WechatConfig;
