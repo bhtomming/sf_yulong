@@ -43,10 +43,7 @@ final class User implements UserInterface
      */
     private $member;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Wechat", cascade={"persist", "remove"})
-     */
-    private $wechat;
+
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\RefundLog", inversedBy="checker", cascade={"persist", "remove"})
@@ -57,6 +54,11 @@ final class User implements UserInterface
      * @ORM\OneToOne(targetEntity="App\Entity\Cash", inversedBy="checker", cascade={"persist", "remove"})
      */
     private $checkCashLog;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\WeChat", inversedBy="user", cascade={"persist", "remove"})
+     */
+    private $wechat;
 
 
 
@@ -147,17 +149,6 @@ final class User implements UserInterface
         return $this;
     }
 
-    public function getWechat(): ?Wechat
-    {
-        return $this->wechat;
-    }
-
-    public function setWechat(?Wechat $wechat): self
-    {
-        $this->wechat = $wechat;
-
-        return $this;
-    }
 
     public function getCheckRefundLog(): ?RefundLog
     {
@@ -182,4 +173,17 @@ final class User implements UserInterface
 
         return $this;
     }
+
+    public function getWechat(): ?WeChat
+    {
+        return $this->wechat;
+    }
+
+    public function setWechat(?WeChat $wechat): self
+    {
+        $this->wechat = $wechat;
+
+        return $this;
+    }
+
 }

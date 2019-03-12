@@ -10,6 +10,8 @@
 namespace App\Servers;
 
 
+use App\Entity\Member;
+use App\Entity\User;
 use App\Entity\WeChat;
 use App\Entity\WechatConfig;
 use Curl\Curl;
@@ -165,26 +167,113 @@ class WeChatServer
         $toUsername = $data -> ToUserName;
         $keyword = trim($data -> Content);
 
-        //判断是否是事件
-        if($msgType == "event"){
+        $curWechat = $this->em->getRepository(WeChat::class)->findOneBy(['openId'=>$fromUsername]);
+        if(!$curWechat instanceof WeChat){
+            return;
+        }
+
+        $returnData['fromUser'] = $data -> ToUserName;
+
+        //判断是否是事件，微信事件处理
+        if($msgType == "event")
+        {
             $event = $data->Event;
 
             //判断是否是关注事件
-            if($event == "subscribe"){
+            if($event == "subscribe")
+            {
+                $user = new User();
+                $newMember = new Member();
+                $username = date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 4, 8), 1))), 0, 5);
+                $password = substr(md5(time()), 0, 8);
+                $curWechat->setSubscribe(true);
                 //获取扫推荐ID
                 $sceneId = substr($data->EventKey,7);
-                if(!empty($sceneId)){
+                if(!empty($sceneId) && $curWechat->getUser() == null)
+                {
                     //有推荐人的情况下
+                    $member = $this->em->getRepository(Member::class)->find($sceneId);
+                    if(!$member instanceof  Member)
+                    {
+                        return;
+                    }
+                    $parentWechat = $member->getUser()->getWechat();
+                    if($curWechat->getOpenid() == $parentWechat->getOpenid()){
+                        $returnData['content'] ="错误提示：推荐关系不合法可能情况1：自己不能成为自己的下级2：自己有下级后不能成为别人的下级";
+                    }
+
+                    $member->addPoints(1,"推荐下线成功");
+                    $returnData['touser'] = $parentWechat->getOpenid();
+                    $returnData['msgtype'] = 'news';
+                    $returnData['news'] = array(
+                        "articles" => array(
+                            "title" =>"您有新朋友加入了，赶紧看看吧",
+                            "description" =>"新朋友的消费您都将有积分哦",
+                            "url" =>"http://bhyulong.cn/distribute.php",
+                            "picurl" => "http://bhyulong.cn/images/bh_dichan_icon.png"
+                        )
+                    );
+                    //向微信显示内容
+                    $this->sendNews($returnData);
+                    $shop_name = "玉泷商城";
+                    $returnData['content'] = "恭喜您由".$parentWechat->getNickName()."推荐成为".$shop_name."的会员！点击左下角“".$shop_name."”立即购买成为".$shop_name."掌柜，裂变你的代理商，让你每天睡觉都能赚大钱！";
                 }
+
+                $user->setName($username)
+                    ->setPassword($password)
+                    ->setMember($newMember)
+                    ->setWechat($curWechat)
+                ;
+                $userInfo = "您的账号：".$username."密码：".$password;
+                $returnData['content'] .= $userInfo;
+                $returnData['touser'] = $curWechat->getOpenid();
+                //向微信返回信息
+                $this->sendText($returnData);
             }
-            //扫码事件
+            //取消关注事件
+            if($event == "unsubscribe"){
+            }
+            //用户已经关注时才会出现的扫码事件
             if($event == "SCAN"){
-
-
             }
+        }
+        elseif($msgType == "text")//文本消息处理
+        {
+        }
+        elseif($msgType == "image")//图片消息处理
+        {
+        }
+        elseif($msgType == "voice")//语音消息处理
+        {
+        }
+        elseif($msgType == "video")//视频消息处理
+        {
+        }
+        elseif($msgType == "location")//位置消息处理
+        {
+        }
+        elseif($msgType == "link") //链接消息处理
+        {
         }
     }
 
+    //自动向用户发送文本消息
+    public function sendText($data)
+    {
+        $textTpl = "<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%s</CreateTime><MsgType><![CDATA[%s]]></MsgType><Content><![CDATA[%s]]></Content></xml>";
+        sprintf($textTpl,$data['toUser'],$data['fromUser'],time(),$data['msgType'],$data['content']);
+        echo $textTpl;
+    }
+
+    //向用户发送图文链接客服消息
+    public function sendNews($data)
+    {
+        $access_token = $this->getAccessToken();
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token='.$access_token;
+        $this->curl->post($url,json_encode($data));
+        $res = $this->curl->getResponse();
+        echo $res;
+    }
 
 
 }

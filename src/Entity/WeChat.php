@@ -66,10 +66,17 @@ class WeChat
      */
     private $city;
 
+
+
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $subscribeTime;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="wechat", cascade={"persist", "remove"})
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -204,6 +211,24 @@ class WeChat
     public function setSubscribeTime(?\DateTimeInterface $subscribeTime): self
     {
         $this->subscribeTime = $subscribeTime;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newWechat = $user === null ? null : $this;
+        if ($newWechat !== $user->getWechat()) {
+            $user->setWechat($newWechat);
+        }
 
         return $this;
     }
