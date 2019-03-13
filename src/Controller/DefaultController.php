@@ -20,7 +20,10 @@ use App\Entity\Trade;
 use App\Entity\User;
 use App\Entity\WechatConfig;
 use App\Servers\MemberManager;
+use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Yansongda\Pay\Pay;
@@ -127,9 +130,14 @@ class DefaultController extends AbstractController
      * @Route("/recommend/", name="recommend")
      * 推荐页面
      */
-    public function recommend()
+    public function recommend(WeChatServer $wechatServer)
     {
-        return $this->render("default/recommend.html.twig");
+        $user = $this->getUser();
+        if(!$user instanceof User){
+            $this->redirectToRoute("login");
+        }
+        $image = $wechatServer->createQrcode($user->getWeChat());
+        return $this->render("default/recommend.html.twig",['image'=>$image]);
     }
 
     /**
@@ -226,6 +234,31 @@ class DefaultController extends AbstractController
 
         return $pay->success()->send();
 
+    }
+
+    /**
+     * @Route("/wechat", name="wx_api")
+     * 微信支付返回页面
+     */
+    public function wechatInterface(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $wechatServer = new WeChatServer($em);
+        $signature = trim($request->get('signature'));
+        if(!empty($signature))
+        {
+            return new Response($wechatServer->validate($request));
+        }
+        return new Response($wechatServer->listenToWechat($request));
+    }
+
+    /**
+     * @Route("/login", name="login")
+     * 微信支付返回页面
+     */
+    public function login()
+    {
+        return $this->render("default/login.html.twig");
     }
 
     public function getWechatPayConfig()

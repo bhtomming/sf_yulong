@@ -16,6 +16,7 @@ use App\Entity\WeChat;
 use App\Entity\WechatConfig;
 use Curl\Curl;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 
 class WeChatServer
@@ -24,17 +25,19 @@ class WeChatServer
 
     private $wechatConfig;
 
-    private $wechat;
+    private $fileSystem;
 
     private $curl;
 
+    private $returnData;
 
-    public function __construct(EntityManagerInterface $em,WeChat $wechat = null)
+
+    public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
         $this->wechatConfig = $this->getWeChatConfig();
-        $this->wechat = $wechat;
         $this->curl = new Curl();
+        $this->fileSystem = new Filesystem();
     }
 
 
@@ -45,22 +48,131 @@ class WeChatServer
     }
 
     //注册会员信息
-    public function register()
+    public function register($openId): ? WeChat
     {
-
+        $user = new User();
+        $newMember = new Member();
+        $weChat = new WeChat();
+        $weChat->setOpenid($openId);
+        $userInfo = $this->getUserInfo($openId);
+        $weChat
+            ->setNickName($userInfo->nickname)
+            ->setHeadImg($userInfo->headimgurl)
+            ->setCity($userInfo->city)
+            ->setSex($userInfo->sex)
+            ->setProvicne($userInfo->province)
+            ->setCountry($userInfo->country)
+            ->setSubscribeTime($userInfo->subscribe_time)
+        ;
+        $username = date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 4, 8), 1))), 0, 5);
+        $password = substr(md5(time()), 0, 8);
+        $userInfo = "您的账号：".$username."密码：".$password;
+        $user->setName($username)
+            ->setPassword($password)
+            ->setMember($newMember)
+            ->setWechat($weChat)
+        ;
+        $this->returnData['content'] .= $userInfo;
+        $this->returnData['touser'] = $weChat->getOpenid();
+        $this->em->persist($user);
+        $this->em->flush();
+        return $weChat;
     }
 
     //创建推荐二维码
-    public function createQrcode()
+    public function createQrcode(WeChat $wechat)
     {
+        $qr_width = 255;  // 是二维码图片宽度
+        $qr_height = 255; // 二维码图片高度
+        $qr_x = 152;
+        $qr_y = 380;
+        $hearimg_width = 80;
+        $hearimg_hight = 80;
+        $hearimg_x = 80;
+        $hearimg_y = 50;
+        $bg_img = "data/qrcode/1540239067195492735.jpg"; //合成图片的背景
+        $text_red = 255;
+        $text_geren = 0;
+        $text_blue = 0;
+
+        //===================================================================//
+
+        $fname = time().'jpg';
+
+        $h_imgsrc = $this->createFaceImg($wechat,$fname);
+
+        $time = substr($fname,0,-4);
+        $qr_src = 'qrcode/scene/'.$wechat->getUser()->getId().".jpg";
+        $qr_imgs= "images/qrcode/".$time.".jpg";
+        //加载图片信息
+        $target_qr =  imagecreatetruecolor($qr_width,$qr_height);
+        $source_qr = imagecreatefromjpeg(ROOT_PATH.$qr_src);
+        //调整二维码大小
+        Imagecopyresized($target_qr, $source_qr, 0, 0, 23, 23, $qr_width, $qr_height, 383, 383);
+        imagejpeg($target_qr,ROOT_PATH.$qr_imgs);
+        imagedestroy($target_qr);
+        imagedestroy($source_qr);
+
+
+        $h_time=$time."_1";
+
+        $h_name ='qrcode/'.$h_time.'.jpg';
+        //判断 用户头像格式 转 JPG 格式,改变头像图片大小
+        if(!$this->fileSystem->exists('qrcode/'.$h_time.'.jpg')){
+            $h_name=resizejpg(ROOT_PATH.$h_imgsrc,$hearimg_width,$hearimg_hight,$h_time);
+        }
+
+        //头像
+        $h_imgs = $h_name;
+
+        //背景图片
+        if(!$this->fileSystem->exists($bg_img) )
+        {
+            $target =__DIR__. 'data/qrcode/tianxin100.jpg';//背景图片
+
+        }
+        $target =__DIR__  . $bg_img ;//背景图片 mobile下的qrcode 文件下
+
+        $target_img = Imagecreatefromjpeg($target);
+        $source = Imagecreatefromjpeg(ROOT_PATH.$qr_imgs );
+        $h_source = Imagecreatefromjpeg(ROOT_PATH. $h_imgs);
+        imagecopy($target_img,$source,$qr_x,$qr_y,0,0,$qr_width,$qr_height);//创建二维码图片大小
+        imagecopy($target_img,$h_source,$hearimg_x,$hearimg_y,0,0,$hearimg_width,$hearimg_hight);//创建头像大小
+        $fontfile =__DIR__. "data/qrcode/simsun.ttf";
+
+        #水印文字 合成用户名
+        $nickname = empty($wechat->getNickName())? $wechat->getUser()->getUsername() : $wechat->getNickName();
+        #打水印
+        $textcolor = imagecolorallocate($target_img, $text_red, $text_geren, $text_blue);
+
+        imagettftext($target_img,18,0,188,129,$textcolor,$fontfile,$nickname);
+        Imagejpeg($target_img, __DIR__.'qrcode/'.$time.'.jpg');
+
+        imagedestroy($target_img);
+        imagedestroy($source);
+        imagedestroy($h_source);
+        $s_data= $time.'.jpg';
+
+        return $s_data ;
+
 
     }
 
     //创建头像
-    public function createFaceImg(WeChat $weChat)
+    public function createFaceImg(WeChat $weChat,$fname)
     {
+        $time = substr($fname,0,-4);
+        //头像获取
+        $h_imgsrc= "/images/qrcode/head/".$time.".jpg";
 
-        return false;
+        if( !$this->fileSystem->exists( $h_imgsrc) )
+        {
+            if(!$weChat->getHeadImg()){
+                $h_imgsrc = "data/qrcode/headImg.jpg";
+            }
+            $this->fileSystem->copy($weChat->getHeadImg(),$h_imgsrc,true);
+        }
+        return $h_imgsrc;
     }
 
     //获取微信用户基本信息
@@ -115,7 +227,38 @@ class WeChatServer
     //创建微信菜单
     public function createMenu()
     {
-
+        $menu = array(
+            'button'=>array(
+                array(
+                    'name'=>'菜单1',
+                    'sub_button' => array(
+                        array(
+                            'type' => 'view',
+                            'url' => 'https://www.baidu.com',
+                            'name' => '搜索',
+                        ),
+                    ),
+                ),
+                array(
+                    'name' => '菜单2',
+                    'sub_button'=>array(
+                        array(
+                            'name' => '发送位置',
+                            'type' => 'location_select',
+                            'key' => 'rselfmenu_2_0',
+                        )
+                    ),
+                ),
+                array(
+                    'name' => '扫码',
+                    'type' => 'scancode_waitmsg',
+                    'key' => 'rselfmenu_0_0',
+                )
+            )
+        );
+        $menu_json = $this->zh_json_encode($menu);
+        $url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={$this->getAccessToken()}";
+        $this->curl->post($url,$menu_json);
     }
 
     //关键词回复
@@ -124,38 +267,36 @@ class WeChatServer
 
     }
 
-    //推荐成功给会员加分
-    public function addPoints()
-    {
-
-    }
 
     //通过OpenId查找会员
     public function findMemberByOpenId($openId)
     {
-        return $this->em->getRepository(WeChat::class)->findOneBy(['openId'=>$openId]);
+        return $this->em->getRepository(WeChat::class)->findOneBy(['openid'=>$openId]);
     }
 
-    //用户关注的时候调用
-    public function setSubscribe($openId)
+    //微信对接验证
+    public function validate(Request $request)
     {
-        $wechat = new WeChat();
-        $wechat->setOpenid($openId);
-        $wechat->setSubscribe(true);
-        $userInfo = $this->getUserInfo($openId);
-        $wechat
-            ->setNickName($userInfo->nickname)
-            ->setHeadImg($userInfo->headimgurl)
-            ->setCity($userInfo->city)
-            ->setSex($userInfo->sex)
-            ->setProvicne($userInfo->province)
-            ->setCountry($userInfo->country)
-            ->setSubscribeTime($userInfo->subscribe_time)
-            ;
+        $signature = trim($request->get('signature'));
+        $timestamp = trim($request->get('timestamp'));
+        $nonce = trim($request->get('nonce'));
+        $echostr = trim($request->get('echostr'));
+        $wechat = $this->wechatConfig;
+        $token = $wechat->getToken();
+
+        $tmparr = array($token,$timestamp,$nonce);
+        sort($tmparr);
+        $tmpstr = implode($tmparr);
+        $vlsignatu = sha1($tmpstr);
+        if($vlsignatu != $signature){
+            return 'error<br/>'. 'signature='.$signature. '<br/>vlsignatu='.$vlsignatu;
+        }
+        return $echostr;
     }
 
     public function listenToWechat(Request $request)
     {
+
         $response = $request->getContent();
         if(empty($response))
         {
@@ -164,15 +305,11 @@ class WeChatServer
         $data = simplexml_load_string($request->getContent());
         $fromUsername = $data -> FromUserName;
         $msgType = $data -> MsgType;
-        $toUsername = $data -> ToUserName;
+        $this->returnData['toUser'] = $data -> ToUserName;
         $keyword = trim($data -> Content);
 
-        $curWechat = $this->em->getRepository(WeChat::class)->findOneBy(['openId'=>$fromUsername]);
-        if(!$curWechat instanceof WeChat){
-            return;
-        }
-
-        $returnData['fromUser'] = $data -> ToUserName;
+        $curWechat = $this->em->getRepository(WeChat::class)->findOneBy(['openid'=>$fromUsername]);
+        $this->returnData['fromUser'] = $data -> ToUserName;
 
         //判断是否是事件，微信事件处理
         if($msgType == "event")
@@ -182,10 +319,11 @@ class WeChatServer
             //判断是否是关注事件
             if($event == "subscribe")
             {
-                $user = new User();
-                $newMember = new Member();
-                $username = date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 4, 8), 1))), 0, 5);
-                $password = substr(md5(time()), 0, 8);
+                if(!$curWechat instanceof WeChat)
+                {   //新用户将自动注册
+                    $curWechat = $this->register($fromUsername);
+                }
+
                 $curWechat->setSubscribe(true);
                 //获取扫推荐ID
                 $sceneId = substr($data->EventKey,7);
@@ -199,13 +337,13 @@ class WeChatServer
                     }
                     $parentWechat = $member->getUser()->getWechat();
                     if($curWechat->getOpenid() == $parentWechat->getOpenid()){
-                        $returnData['content'] ="错误提示：推荐关系不合法可能情况1：自己不能成为自己的下级2：自己有下级后不能成为别人的下级";
+                        $this->returnData['content'] ="错误提示：推荐关系不合法可能情况1：自己不能成为自己的下级2：自己有下级后不能成为别人的下级";
                     }
 
                     $member->addPoints(1,"推荐下线成功");
-                    $returnData['touser'] = $parentWechat->getOpenid();
-                    $returnData['msgtype'] = 'news';
-                    $returnData['news'] = array(
+                    $this->returnData['toUser'] = $parentWechat->getOpenid();
+                    $this->returnData['msgType'] = 'news';
+                    $this->returnData['news'] = array(
                         "articles" => array(
                             "title" =>"您有新朋友加入了，赶紧看看吧",
                             "description" =>"新朋友的消费您都将有积分哦",
@@ -214,31 +352,32 @@ class WeChatServer
                         )
                     );
                     //向微信显示内容
-                    $this->sendNews($returnData);
+                    $this->sendNews($this->returnData);
                     $shop_name = "玉泷商城";
-                    $returnData['content'] = "恭喜您由".$parentWechat->getNickName()."推荐成为".$shop_name."的会员！点击左下角“".$shop_name."”立即购买成为".$shop_name."掌柜，裂变你的代理商，让你每天睡觉都能赚大钱！";
+                    $this->returnData['content'] = "恭喜您由".$parentWechat->getNickName()."推荐成为".$shop_name."的会员！点击左下角“".$shop_name."”立即购买成为".$shop_name."掌柜，裂变你的代理商，让你每天睡觉都能赚大钱！";
                 }
 
-                $user->setName($username)
-                    ->setPassword($password)
-                    ->setMember($newMember)
-                    ->setWechat($curWechat)
-                ;
-                $userInfo = "您的账号：".$username."密码：".$password;
-                $returnData['content'] .= $userInfo;
-                $returnData['touser'] = $curWechat->getOpenid();
                 //向微信返回信息
-                $this->sendText($returnData);
+                return $this->sendText($this->returnData);
             }
             //取消关注事件
             if($event == "unsubscribe"){
+                $curWechat->setSubscribe(false);
             }
             //用户已经关注时才会出现的扫码事件
             if($event == "SCAN"){
+                //用户已经关注过
+                if($curWechat->getSubscribe())
+                {
+                    $this->returnData['content'] = "您已经关注过，请不要重复关注";
+                }
+                $this->returnData['toUser'] = $curWechat->getOpenid();
+                return $this->sendText($data);
             }
         }
         elseif($msgType == "text")//文本消息处理
         {
+            $keyword = trim($data -> Content);
         }
         elseif($msgType == "image")//图片消息处理
         {
@@ -254,15 +393,21 @@ class WeChatServer
         }
         elseif($msgType == "link") //链接消息处理
         {
+        }else//默认情况处理
+        {
+            $this->returnData['content'] = '您已经关注过请不要重复关注!';
         }
+        $this->returnData['msgType'] = 'text';
+        $this->returnData['content'] = '您已经关注过请不要重复关注!';
+        return $this->sendText($this->returnData);
     }
 
     //自动向用户发送文本消息
     public function sendText($data)
     {
         $textTpl = "<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%s</CreateTime><MsgType><![CDATA[%s]]></MsgType><Content><![CDATA[%s]]></Content></xml>";
-        sprintf($textTpl,$data['toUser'],$data['fromUser'],time(),$data['msgType'],$data['content']);
-        echo $textTpl;
+        $resTpl = sprintf($textTpl,$data['toUser'],$data['fromUser'],time(),$data['msgType'],$data['content']);
+        return $resTpl;
     }
 
     //向用户发送图文链接客服消息
@@ -272,8 +417,36 @@ class WeChatServer
         $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token='.$access_token;
         $this->curl->post($url,json_encode($data));
         $res = $this->curl->getResponse();
-        echo $res;
+        return $res;
     }
+
+    //对数组或对象里的中文进行url编码
+    function url_encode($data)
+    {
+        if(is_array($data) || is_object($data)){
+            foreach ($data as $k => $v){
+                if(is_scalar($v)){
+                    if(is_array($data)){
+                        $data[$k] = urlencode($v);
+                    }elseif (is_object($data)){
+                        $data->$k = urlencode($v);
+                    }
+                }elseif(is_array($v) && is_array($data) || is_object($v) && is_array($data)){
+                    $data[$k] = $this->url_encode($v);
+                }elseif(is_object($data)){
+                    $data->$k = $this->url_encode($v);
+                }
+            }
+        }
+        return $data;
+    }
+
+    public function zh_json_encode($data){
+        $data = $this->url_encode($data);
+        $data = json_encode($data);
+        return urldecode($data);
+    }
+
 
 
 }

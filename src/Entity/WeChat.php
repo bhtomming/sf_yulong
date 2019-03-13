@@ -138,6 +138,9 @@ class WeChat
 
     public function setSubscribe(?bool $subscribe): self
     {
+        if($subscribe){
+            $this->setSubscribeTime(new \DateTime('now'));
+        }
         $this->subscribe = $subscribe;
 
         return $this;
