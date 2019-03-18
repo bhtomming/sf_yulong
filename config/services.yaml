@@ -78,4 +78,3 @@ services:
         arguments: [~, App\Entity\PointsConfig, ~]
         tags:
             - { name: sonata.admin, manager_type: orm,group: '积分管理', label: 积分设置,icon: '<i class="fa fa-bitcoin"></i>' }
-

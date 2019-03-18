@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Yansongda\Pay\Pay;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class DefaultController extends AbstractController
 {
@@ -116,6 +117,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/cart/list", name="list_cart")
      * 购物车列表
+     * @IsGranted("ROLE_USER")
      *
      */
     public function listCart()
@@ -130,13 +132,15 @@ class DefaultController extends AbstractController
      * @Route("/recommend/", name="recommend")
      * 推荐页面
      */
-    public function recommend(WeChatServer $wechatServer)
+    public function recommend(Request $request,WeChatServer $wechatServer)
     {
+        $wechatServer->get_oauth2_code($request);
         $user = $this->getUser();
         if(!$user instanceof User){
             $this->redirectToRoute("login");
         }
-        $image = $wechatServer->createQrcode($user->getWeChat());
+        //$image = $wechatServer->createQrcode($user->getWeChat());
+        $image = "adfd";
         return $this->render("default/recommend.html.twig",['image'=>$image]);
     }
 

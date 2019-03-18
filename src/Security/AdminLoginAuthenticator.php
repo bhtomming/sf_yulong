@@ -61,7 +61,7 @@ class AdminLoginAuthenticator extends AbstractFormLoginAuthenticator implements 
      */
     public function supports(Request $request)
     {
-        if ($request->getPathInfo() != '/login' || $request->getMethod() != 'POST') {
+        if ($request->getPathInfo() != '/admin/login' || $request->getMethod() != 'POST') {
             return false;
         }
 

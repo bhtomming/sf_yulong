@@ -83,6 +83,9 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "easywechat-composer/easywechat-composer": {
+        "version": "1.1.6"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.3.3"
     },
@@ -122,6 +125,12 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
+    "overtrue/socialite": {
+        "version": "2.0.7"
+    },
+    "overtrue/wechat": {
+        "version": "4.1.20"
+    },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
     },
@@ -130,6 +139,9 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "0.4.0"
+    },
+    "pimple/pimple": {
+        "version": "v3.2.3"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -304,6 +316,9 @@
     },
     "symfony/property-info": {
         "version": "v4.2.3"
+    },
+    "symfony/psr-http-message-bridge": {
+        "version": "v1.2.0"
     },
     "symfony/routing": {
         "version": "4.2",

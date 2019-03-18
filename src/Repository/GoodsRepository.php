@@ -29,6 +29,15 @@ class GoodsRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findByKeyword($keyword)
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.name like :keyword')
+            ->setParameter('keyword',$keyword)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     // /**
     //  * @return Goods[] Returns an array of Goods objects
     //  */

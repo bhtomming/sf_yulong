@@ -10,13 +10,20 @@
 namespace App\Servers;
 
 
+use App\Entity\Goods;
 use App\Entity\Member;
 use App\Entity\User;
 use App\Entity\WeChat;
 use App\Entity\WechatConfig;
 use Curl\Curl;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyWeChat\Factory;
+use EasyWeChat\Kernel\Messages\News;
+use EasyWeChat\Kernel\Messages\NewsItem;
+use EasyWeChat\Kernel\Messages\Text;
+use EasyWeChat\OfficialAccount\Application;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class WeChatServer
@@ -31,6 +38,8 @@ class WeChatServer
 
     private $returnData;
 
+    private $app;
+
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -38,6 +47,18 @@ class WeChatServer
         $this->wechatConfig = $this->getWeChatConfig();
         $this->curl = new Curl();
         $this->fileSystem = new Filesystem();
+        $this->app = $this->getApp();
+    }
+
+    public function getApp(): ? Application
+    {
+        $config = array(
+            'app_id' => $this->wechatConfig->getAppid(),
+            'secret' => $this->wechatConfig->getAppscret(),
+            // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
+            'response_type' => 'array',
+        );
+        return Factory::officialAccount($config);
     }
 
 
@@ -178,93 +199,101 @@ class WeChatServer
     //获取微信用户基本信息
     public function getUserInfo($openId)
     {
-        $token = $this->getAccessToken();
-        $userInfoUrl = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='.$token.'&openid='.$openId.'&lang=zh_CN';
-        $this->curl->get($userInfoUrl);
-        $userInfo = json_decode($this->curl->getResponse());
+        $user = $this->app->user->get($openId);
+        $userInfo = json_decode($user);
         return $userInfo;
     }
 
     //获取微信用户带参数二维码
     public function getQrcode($scene_id)
     {
-        $access_token = $this->getAccessToken();
-        $qurl = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$access_token;
-        $qr_info = array(
-            'action_name' => 'QR_LIMIT_SCENE',
-            "action_info"=>array(
-                "scene" => array(
-                    "scene_id"=> $scene_id
-                )
-            )
-        );
-        $curl = new Curl();
-        $curl->post($qurl,$qr_info);
-        $wxResult = json_decode($curl->getResponse());
-        $ticket = $wxResult->ticket;
-        $curl->setHeader('Accept-Ranges','bytes');
-        $curl->setHeader('Cache-control','max-age=604800');
-        $curl->setHeader('Connection','keep-alive');
-        $curl->setHeader('Content-Type','image/jpg');
-        $qImgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".$ticket;
-
+        $qrUrl = $this->app->qrcode->forever($scene_id);
+        $url = $this->app->qrcode->url($qrUrl['ticket']);
         $imgPath = "qrcode/scene/{$scene_id}.jpg";
-        $path = ROOT_PATH .$imgPath;
-        $qrFile = fopen($path,'wb');
-        $curl->setOpt(CURLFile,$qrFile);
-        $curl->get($qImgUrl);
-        $curl->setOpt(CURLFile,NULL);
-        fclose($qrFile);
+        $this->fileSystem->copy($url,$imgPath,true);
         return $imgPath;
     }
 
     //获取access_token
     public function getAccessToken()
     {
-        return $this->wechatConfig->getAccessToken();
+        $expiresIn = $this->wechatConfig->getExpiresIn();
+        $accessToken = $this->wechatConfig->getAccessToken();
+        if(time() >= $expiresIn){
+            $accessToken = $this->app->access_token->getToken(true);
+            $this->wechatConfig->setAccessToken($accessToken);
+            $this->wechatConfig->setExpiresIn(time('now') + 7200);
+        }
+
+        return $accessToken;
     }
 
     //创建微信菜单
     public function createMenu()
     {
-        $menu = array(
-            'button'=>array(
-                array(
-                    'name'=>'菜单1',
-                    'sub_button' => array(
-                        array(
-                            'type' => 'view',
-                            'url' => 'https://www.baidu.com',
-                            'name' => '搜索',
-                        ),
-                    ),
-                ),
-                array(
-                    'name' => '菜单2',
-                    'sub_button'=>array(
-                        array(
-                            'name' => '发送位置',
-                            'type' => 'location_select',
-                            'key' => 'rselfmenu_2_0',
-                        )
-                    ),
-                ),
-                array(
-                    'name' => '扫码',
-                    'type' => 'scancode_waitmsg',
-                    'key' => 'rselfmenu_0_0',
-                )
-            )
-        );
-        $menu_json = $this->zh_json_encode($menu);
-        $url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={$this->getAccessToken()}";
-        $this->curl->post($url,$menu_json);
+        $menu = [
+            [
+                "name" => "玉泷集团",
+                "sub_button"  => [
+                    [
+                        "type" => "view",
+                        "name" => "公司简介",
+                        "url" => ""
+                    ],
+                    [
+                        "type" => "view",
+                        "name" => "活动资讯",
+                    ]
+                ]
+            ],
+            [
+                "name" => "商城首页",
+                "type" => "view",
+                "url" => "http://bhyulong.cn"
+            ],
+            [
+                "name" =>"会员中心",
+                "sub_button" => [
+                    [
+                        "type" => "view",
+                        "name" => "联系客服",
+                        "url"  => "http://www.soso.com/"
+                    ],
+                    [
+                        "type" => "view",
+                        "name" => "申请合作",
+                        "url"  => "http://v.qq.com/"
+                    ],
+                    [
+                        "type" => "view",
+                        "name" => "会员中心",
+                        "url" => "http://v.qq.com/"
+                    ],
+                ],
+            ]
+        ];
+        $this->app->menu->create($menu);
     }
 
     //关键词回复
-    public function keywordsRefund()
+    public function keywordsRefund($keyword)
     {
-
+        $keyword = strtolower($keyword);
+        if($keyword == "wifi")
+        {
+            $text = new Text("wifi 密码是: 8888888");
+        }
+        $goods = $this->em->getRepository(Goods::class)->findByKeyword($keyword);
+        $items = [
+            new NewsItem([
+                'title' => $goods->getName(),
+                "description" =>$goods->getDescription(),
+                "url" =>$goods->getUrl(),
+                "image"=>$goods->getTitleImg()
+            ])
+        ];
+        $news = new News($items);
+        return $news;
     }
 
 
@@ -296,7 +325,7 @@ class WeChatServer
 
     public function listenToWechat(Request $request)
     {
-
+        $server = $this->app->server;
         $response = $request->getContent();
         if(empty($response))
         {
@@ -419,6 +448,8 @@ class WeChatServer
         $res = $this->curl->getResponse();
         return $res;
     }
+
+
 
     //对数组或对象里的中文进行url编码
     function url_encode($data)

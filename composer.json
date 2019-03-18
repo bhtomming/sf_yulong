@@ -7,6 +7,7 @@
         "ext-iconv": "*",
         "api-platform/api-pack": "^1.2",
         "curl/curl": "^2.2",
+        "overtrue/wechat": "~4.0",
         "sensio/framework-extra-bundle": "^5.2",
         "sonata-project/admin-bundle": "^3.45",
         "sonata-project/doctrine-orm-admin-bundle": "^3.8",
