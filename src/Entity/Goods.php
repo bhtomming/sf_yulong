@@ -386,4 +386,9 @@ class Goods
 
         return $this;
     }
+
+    public function getUrl()
+    {
+        return "http://weixin.drupai.com/goods/".$this->id;
+    }
 }

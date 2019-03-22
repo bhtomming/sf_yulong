@@ -35,8 +35,10 @@ class GoodsRepository extends ServiceEntityRepository
             ->orderBy("g.publishTime","DESC")
             ->andWhere('g.name like :keyword')
             ->setParameter('keyword','%'.$keyword.'%')
+            ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult(1);
+            ->getOneOrNullResult()
+            ;
     }
 
     // /**

@@ -21,6 +21,7 @@ use App\Entity\User;
 use App\Entity\WechatConfig;
 use App\Servers\MemberManager;
 use App\Servers\WeChatServer;
+use EasyWeChat\Kernel\Messages\NewsItem;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -253,8 +254,8 @@ class DefaultController extends AbstractController
         {
             return new Response($wechatServer->validate($request));
         }*/
-        $goods = $em->getRepository(Goods::class)->findByKeyword("海景房");
-        dump($goods);exit;
+
+
         return $wechatServer->listenToWechat($request);
     }
 

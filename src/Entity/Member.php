@@ -436,6 +436,11 @@ class Member
 
     public function setParent(?self $parent): self
     {
+        //有下线不能成为别人的下级
+        if($this->getMembers()->count() != 0)
+        {
+            return $this;
+        }
         $this->parent = $parent;
 
         return $this;

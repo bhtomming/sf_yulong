@@ -300,11 +300,16 @@ class WeChatServer
     public function keywordsRefund($keyword)
     {
         $keyword = strtolower($keyword);
+        //用户查询WIFI时回复
         if($keyword == "wifi")
         {
             return"wifi 密码是: 8888888";
         }
         $goods = $this->em->getRepository(Goods::class)->findByKeyword($keyword);
+        if(!$goods instanceof Goods)
+        {
+            return "没有找到您要的内容";
+        }
         $items = [
             new NewsItem([
                 'title' => $goods->getName(),
@@ -346,32 +351,31 @@ class WeChatServer
 
     public function listenToWechat(Request $request)
     {
+        //服务器收到消息记录
+        $this->app->logger->extend('single', function($app, $config){
+            return new Logger($this->parseChannel($config), [
+                $this->prepareHandler(new RotatingFileHandler(
+                    $config['path'], $config['days'], $this->level($config)
+                )),
+            ]);
+        });
 
         $this->app->server->push(function ($message) {
             switch ($message['MsgType']) {
                 case 'event':
+                    //关注事件处理
                     if($message['Event'] == "subscribe")
                     {
-                        return "欢迎关注本公众号";
+                        return $this->subscribe($message);
                     }
-                    return '收到事件消息';
+                    //取消关注事件
+                    if($message['Event'] == "unsubscribe"){
+                        $this->unsubscribe($message);
+                    }
+                    return "您已经关注过，请不要重复关注";
                     break;
                 case 'text':
-                    if(strtolower($message['Content']) == "wifi")
-                    {
-                        return "wifi 密码是: yl888888";
-                    }
-                    $goods = $this->em->getRepository(Goods::class)->findByKeyword($message['Content']);
-                    $items = [
-                        new NewsItem([
-                            'title' => $goods->getName(),
-                            "description" =>$goods->getDescription(),
-                            "url" =>$goods->getUrl(),
-                            "image"=>$goods->getTitleImg()
-                        ])
-                    ];
-                    $news = new News($items);
-                    return $news;
+                    return $this->keywordsRefund($message['Content']);
                     break;
                 case 'image':
                     return '收到图片消息';
@@ -394,169 +398,80 @@ class WeChatServer
                     return '收到其它消息';
                     break;
             }
-            return "您好！欢迎使用 EasyWeChat";
         });
-        //服务记录
-        $this->app->logger->extend('single', function($app, $config){
-            return new Logger($this->parseChannel($config), [
-                $this->prepareHandler(new RotatingFileHandler(
-                    $config['path'], $config['days'], $this->level($config)
-                )),
-            ]);
-        });
+
         $response = $this->app->server->serve();
         return $response;
 
-        $response = $request->getContent();
-        if(empty($response))
-        {
-            return;
-        }
-        $data = simplexml_load_string($request->getContent());
-        $fromUsername = $data -> FromUserName;
-        $msgType = $data -> MsgType;
-        $this->returnData['toUser'] = $data -> ToUserName;
-        $keyword = trim($data -> Content);
+    }
 
-        $curWechat = $this->em->getRepository(WeChat::class)->findOneBy(['openid'=>$fromUsername]);
-        $this->returnData['fromUser'] = $data -> ToUserName;
+    //关注处理
+    public function subscribe($msg)
+    {
+        $curOpenId = $msg['FromUserName'];
+        $curWechat = $this->getWechat($curOpenId);
+        //获取二维码中的推荐ID
+        $sceneId = substr($msg['EventKey'],7);
 
-        //判断是否是事件，微信事件处理
-        if($msgType == "event")
-        {
-            $event = $data->Event;
+        //判断是否是新用户
+        if(!$curWechat instanceof WeChat)
+        {   //新用户将自动注册
+            $curWechat = $this->register($curOpenId);
+            $member = $curWechat->getUser()->getMember();
 
-            //判断是否是关注事件
-            if($event == "subscribe")
+            //二维码中存在推荐人ID
+            if(!empty($sceneId))
             {
-                if(!$curWechat instanceof WeChat)
-                {   //新用户将自动注册
-                    $curWechat = $this->register($fromUsername);
-                }
-
-                $curWechat->setSubscribe(true);
-                //获取扫推荐ID
-                $sceneId = substr($data->EventKey,7);
-                if(!empty($sceneId) && $curWechat->getUser() == null)
+                //有推荐人的情况下
+                $parentUser = $this->em->getRepository(User::class)->find($sceneId);
+                if(!$parentUser instanceof User)
                 {
-                    //有推荐人的情况下
-                    $member = $this->em->getRepository(Member::class)->find($sceneId);
-                    if(!$member instanceof  Member)
-                    {
-                        return;
-                    }
-                    $parentWechat = $member->getUser()->getWechat();
-                    if($curWechat->getOpenid() == $parentWechat->getOpenid()){
-                        $this->returnData['content'] ="错误提示：推荐关系不合法可能情况1：自己不能成为自己的下级2：自己有下级后不能成为别人的下级";
-                    }
-
-                    $member->addPoints(1,"推荐下线成功");
-                    $this->returnData['toUser'] = $parentWechat->getOpenid();
-                    $this->returnData['msgType'] = 'news';
-                    $this->returnData['news'] = array(
-                        "articles" => array(
-                            "title" =>"您有新朋友加入了，赶紧看看吧",
-                            "description" =>"新朋友的消费您都将有积分哦",
-                            "url" =>"http://bhyulong.cn/distribute.php",
-                            "picurl" => "http://bhyulong.cn/images/bh_dichan_icon.png"
-                        )
-                    );
-                    //向微信显示内容
-                    $this->sendNews($this->returnData);
-                    $shop_name = "玉泷商城";
-                    $this->returnData['content'] = "恭喜您由".$parentWechat->getNickName()."推荐成为".$shop_name."的会员！点击左下角“".$shop_name."”立即购买成为".$shop_name."掌柜，裂变你的代理商，让你每天睡觉都能赚大钱！";
+                    return "推荐人信息不正确";
                 }
-
-                //向微信返回信息
-                return $this->sendText($this->returnData);
-            }
-            //取消关注事件
-            if($event == "unsubscribe"){
-                $curWechat->setSubscribe(false);
-            }
-            //用户已经关注时才会出现的扫码事件
-            if($event == "SCAN"){
-                //用户已经关注过
-                if($curWechat->getSubscribe())
+                if($sceneId == $curWechat->getUser()->getId() || $curWechat->getUser()->getMember()->getMembers()->count() !=0)
                 {
-                    $this->returnData['content'] = "您已经关注过，请不要重复关注";
+                    return "错误提示：推荐关系不合法可能情况1：自己不能成为自己的下级2：自己有下级后不能成为别人的下级";
                 }
-                $this->returnData['toUser'] = $curWechat->getOpenid();
-                return $this->sendText($data);
+                $parentMember = $parentUser->getMember();
+                //给推荐人加1分
+                $parentMember->addPoints(1,"推荐1人关注公众号");
+                //设置当前用户的推荐人
+                $parentMember->addMember($curWechat->getUser()->getMember());
+                $items = [new NewsItem([
+                    "title" =>"您有新朋友加入了，赶紧看看吧",
+                    "description" =>"新朋友的消费您都将有积分哦",
+                    "url" =>"http://bhyulong.cn/distribute.php",
+                    "picurl" => "http://bhyulong.cn/images/bh_dichan_icon.png"
+                ])];
+                $parentWechat = $parentMember->getUser()->getWechat();
+                $news = new News($items);
+                //向用户的上级发送消息
+                $this->app->customer_service->message($news)->to($parentWechat->getOpenid())->send;
+
+                $shop_name = "玉泷商城";
+
+                return "恭喜您由".$parentWechat->getNickName()."推荐成为".$shop_name."的会员！点击左下角“".$shop_name."”立即购买成为".$shop_name."掌柜，裂变你的代理商，让你每天睡觉都能赚大钱！";
             }
         }
-        elseif($msgType == "text")//文本消息处理
-        {
-            $keyword = trim($data -> Content);
-        }
-        elseif($msgType == "image")//图片消息处理
-        {
-        }
-        elseif($msgType == "voice")//语音消息处理
-        {
-        }
-        elseif($msgType == "video")//视频消息处理
-        {
-        }
-        elseif($msgType == "location")//位置消息处理
-        {
-        }
-        elseif($msgType == "link") //链接消息处理
-        {
-        }else//默认情况处理
-        {
-            $this->returnData['content'] = '您已经关注过请不要重复关注!';
-        }
-        $this->returnData['msgType'] = 'text';
-        $this->returnData['content'] = '您已经关注过请不要重复关注!';
-        return $this->sendText($this->returnData);
+
+        //老用户把关注设置一下。
+        $curWechat->setSubscribe(true);
+
+        //向微信返回信息
+        return "欢迎关注玉泷商城";
+
     }
 
-    //自动向用户发送文本消息
-    public function sendText($data)
+    //取消关注处理
+    public function unsubscribe($msg)
     {
-        $textTpl = "<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%s</CreateTime><MsgType><![CDATA[%s]]></MsgType><Content><![CDATA[%s]]></Content></xml>";
-        $resTpl = sprintf($textTpl,$data['toUser'],$data['fromUser'],time(),$data['msgType'],$data['content']);
-        return $resTpl;
+        $curWechat = $this->getWechat($msg['FromUserName']);
+        $curWechat->setSubscribe(false);
     }
 
-    //向用户发送图文链接客服消息
-    public function sendNews($data)
+    public function getWechat($openId): ? WeChat
     {
-        $access_token = $this->getAccessToken();
-        $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token='.$access_token;
-        $this->curl->post($url,json_encode($data));
-        $res = $this->curl->getResponse();
-        return $res;
-    }
-
-
-
-    //对数组或对象里的中文进行url编码
-    function url_encode($data)
-    {
-        if(is_array($data) || is_object($data)){
-            foreach ($data as $k => $v){
-                if(is_scalar($v)){
-                    if(is_array($data)){
-                        $data[$k] = urlencode($v);
-                    }elseif (is_object($data)){
-                        $data->$k = urlencode($v);
-                    }
-                }elseif(is_array($v) && is_array($data) || is_object($v) && is_array($data)){
-                    $data[$k] = $this->url_encode($v);
-                }elseif(is_object($data)){
-                    $data->$k = $this->url_encode($v);
-                }
-            }
-        }
-        return $data;
-    }
-
-    public function zh_json_encode($data){
-        $data = $this->url_encode($data);
-        $data = json_encode($data);
-        return urldecode($data);
+        return $this->em->getRepository(WeChat::class)->findOneBy(['openid'=>$openId]);
     }
 
 
