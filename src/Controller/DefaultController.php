@@ -242,18 +242,20 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/wechat", name="wx_api")
-     * 微信支付返回页面
+     * 微信服务监听页面
      */
     public function wechatInterface(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $wechatServer = new WeChatServer($em);
-        $signature = trim($request->get('signature'));
+        /*$signature = trim($request->get('signature'));
         if(!empty($signature))
         {
             return new Response($wechatServer->validate($request));
-        }
-        return new Response($wechatServer->listenToWechat($request));
+        }*/
+        $goods = $em->getRepository(Goods::class)->findByKeyword("海景房");
+        dump($goods);exit;
+        return $wechatServer->listenToWechat($request);
     }
 
     /**

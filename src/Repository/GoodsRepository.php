@@ -32,10 +32,11 @@ class GoodsRepository extends ServiceEntityRepository
     public function findByKeyword($keyword)
     {
         return $this->createQueryBuilder('g')
+            ->orderBy("g.publishTime","DESC")
             ->andWhere('g.name like :keyword')
-            ->setParameter('keyword',$keyword)
+            ->setParameter('keyword','%'.$keyword.'%')
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(1);
     }
 
     // /**

@@ -22,6 +22,8 @@ use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use EasyWeChat\Kernel\Messages\Text;
 use EasyWeChat\OfficialAccount\Application;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Logger;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,6 +59,25 @@ class WeChatServer
             'secret' => $this->wechatConfig->getAppscret(),
             // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
             'response_type' => 'array',
+            'log' => [
+                'default' => 'dev', // 默认使用的 channel，生产环境可以改为下面的 prod
+                'channels' => [
+                    // 测试环境
+                    'dev' => [
+                        'driver' => 'single',
+                        'path' => 'tmp/easywechat.log',
+                        'level' => 'debug',
+                        'days' => 5,
+                    ],
+                    // 生产环境
+                    'prod' => [
+                        'driver' => 'daily',
+                        'path' => 'tmp/easywechat.log',
+                        'level' => 'info',
+                        'days' => 5,
+                    ],
+                ],
+            ],
         );
         return Factory::officialAccount($config);
     }
@@ -281,7 +302,7 @@ class WeChatServer
         $keyword = strtolower($keyword);
         if($keyword == "wifi")
         {
-            $text = new Text("wifi 密码是: 8888888");
+            return"wifi 密码是: 8888888";
         }
         $goods = $this->em->getRepository(Goods::class)->findByKeyword($keyword);
         $items = [
@@ -325,7 +346,67 @@ class WeChatServer
 
     public function listenToWechat(Request $request)
     {
-        $server = $this->app->server;
+
+        $this->app->server->push(function ($message) {
+            switch ($message['MsgType']) {
+                case 'event':
+                    if($message['Event'] == "subscribe")
+                    {
+                        return "欢迎关注本公众号";
+                    }
+                    return '收到事件消息';
+                    break;
+                case 'text':
+                    if(strtolower($message['Content']) == "wifi")
+                    {
+                        return "wifi 密码是: yl888888";
+                    }
+                    $goods = $this->em->getRepository(Goods::class)->findByKeyword($message['Content']);
+                    $items = [
+                        new NewsItem([
+                            'title' => $goods->getName(),
+                            "description" =>$goods->getDescription(),
+                            "url" =>$goods->getUrl(),
+                            "image"=>$goods->getTitleImg()
+                        ])
+                    ];
+                    $news = new News($items);
+                    return $news;
+                    break;
+                case 'image':
+                    return '收到图片消息';
+                    break;
+                case 'voice':
+                    return '收到语音消息';
+                    break;
+                case 'video':
+                    return '收到视频消息';
+                    break;
+                case 'location':
+                    return '收到坐标消息';
+                    break;
+                case 'link':
+                    return '收到链接消息';
+                    break;
+                case 'file':
+                    return '收到文件消息';
+                default:
+                    return '收到其它消息';
+                    break;
+            }
+            return "您好！欢迎使用 EasyWeChat";
+        });
+        //服务记录
+        $this->app->logger->extend('single', function($app, $config){
+            return new Logger($this->parseChannel($config), [
+                $this->prepareHandler(new RotatingFileHandler(
+                    $config['path'], $config['days'], $this->level($config)
+                )),
+            ]);
+        });
+        $response = $this->app->server->serve();
+        return $response;
+
         $response = $request->getContent();
         if(empty($response))
         {
