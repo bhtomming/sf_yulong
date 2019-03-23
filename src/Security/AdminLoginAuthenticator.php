@@ -99,7 +99,7 @@ class AdminLoginAuthenticator extends AbstractFormLoginAuthenticator implements 
         $data = $form->getData();
         $request->getSession()->set(
             Security::LAST_USERNAME,
-            $data['username']
+            $data['name']
         );
 
         return $data;
@@ -122,7 +122,7 @@ class AdminLoginAuthenticator extends AbstractFormLoginAuthenticator implements 
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($credentials['username']);
+        return $userProvider->loadUserByUsername($credentials['name']);
     }
 
     /**
@@ -143,6 +143,7 @@ class AdminLoginAuthenticator extends AbstractFormLoginAuthenticator implements 
      */
     public function checkCredentials($credentials, UserInterface $user)
     {
+
         if (!$this->passwordEncoder->isPasswordValid($user, $credentials['password'])) {
             return false;
         }

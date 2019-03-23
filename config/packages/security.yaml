@@ -4,6 +4,8 @@ security:
         #in_memory: { memory: ~ }
         users:
             id: App\Security\UserProvider
+    encoders:
+        App\Entity\User: bcrypt
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -47,6 +49,5 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
         SONATA:
             - ROLE_SONATA_PAGE_ADMIN_PAGE_EDIT
-    encoders:
-        App\Entity\User: bcrypt
+
 

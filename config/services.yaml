@@ -31,6 +31,12 @@ services:
         arguments:
             $em: '%doctrine.entity_managers%'
 
+    app.user.manager:
+        class: App\Servers\UserManager
+        arguments:
+            $entityManager: '%doctrine.entity_managers%'
+
+
     admin.goods:
         class: App\Admin\GoodsAdmin
         arguments: [~, App\Entity\Goods, ~]
@@ -78,3 +84,4 @@ services:
         arguments: [~, App\Entity\PointsConfig, ~]
         tags:
             - { name: sonata.admin, manager_type: orm,group: '积分管理', label: 积分设置,icon: '<i class="fa fa-bitcoin"></i>' }
+

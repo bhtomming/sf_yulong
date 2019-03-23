@@ -13,6 +13,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -21,6 +22,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class UserProvider implements UserProviderInterface
 {
     private $entityManager;
+
+
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -92,8 +95,10 @@ class UserProvider implements UserProviderInterface
         return $class === User::class;
     }
 
-    public function findOneUserBy(array $options): ?User
+    public function findOneUserBy(array $options): ? User
     {
         return $this->entityManager->getRepository(User::class)->findOneBy($options);
     }
+
+
 }

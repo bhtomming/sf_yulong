@@ -103,6 +103,15 @@ final class User implements UserInterface
         return $this;
     }
 
+    public function hasRole($role)
+    {
+        if(!in_array($role,$this->roles))
+        {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * Returns the salt that was originally used to encode the password.
@@ -113,7 +122,7 @@ final class User implements UserInterface
      */
     public function getSalt()
     {
-        return md5(time('now'));
+        return md5(time());
     }
 
     /**
