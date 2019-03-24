@@ -12,6 +12,12 @@ security:
         users:
             id: App\Security\UserProvider
 
+        wechat:
+            id: App\Security\WechatProvider
+
+        all_users:
+            chain:
+                providers: ['wechat','users']
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -30,10 +36,25 @@ security:
                 target:         admin_login
             anonymous:          true
             guard:
+                provider: users
                 authenticators:
                     - App\Security\AdminLoginAuthenticator
         main:
             anonymous: ~
+            form_login:
+                provider:       wechat
+                login_path:     app_login
+                use_forward:    false
+                check_path:     app_login
+                failure_path:   null
+                csrf_token_generator: security.csrf.token_manager
+            logout:
+                path:           /
+                target:         /
+            guard:
+                provider: wechat
+                authenticators:
+                    - App\Security\WechatAuthenticator
             # activate different ways to authenticate
 
             # http_basic: true

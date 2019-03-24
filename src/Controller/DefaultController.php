@@ -260,6 +260,7 @@ class DefaultController extends AbstractController
     }
 
 
+
     public function getWechatPayConfig()
     {
         $em = $this->getDoctrine()->getManager();
