@@ -34,7 +34,7 @@ final class User implements UserInterface
     /**
      * @ORM\Column(type="array")
      */
-    private $roles;
+    private $roles = [];
 
 
     /**
@@ -93,19 +93,28 @@ final class User implements UserInterface
 
     public function getRoles()
     {
-        return $this->roles;
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
     }
 
-    public function setRoles($roles): self
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
 
         return $this;
     }
 
+    public function addRole($role)
+    {
+        $this->roles[] = $role;
+
+        return $this;
+    }
+
     public function hasRole($role)
     {
-        if(!in_array($role,$this->roles))
+        if(!in_array($role,$this->roles,true))
         {
             return false;
         }

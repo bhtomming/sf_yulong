@@ -259,14 +259,6 @@ class DefaultController extends AbstractController
         return $wechatServer->listenToWechat($request);
     }
 
-    /**
-     * @Route("/login", name="login")
-     * 微信支付返回页面
-     */
-    public function login()
-    {
-        return $this->render("default/login.html.twig");
-    }
 
     public function getWechatPayConfig()
     {

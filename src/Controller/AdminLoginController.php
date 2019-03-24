@@ -34,12 +34,9 @@ class AdminLoginController extends AbstractController
      */
     public function loginAction(): Response
     {
-
-
         $form = $this->createForm(AdminLoginForm::class, [
             'name' => $this->authenticationUtils->getLastUsername()
         ]);
-
         return $this->render('security/login.html.twig', [
             'last_username' => $this->authenticationUtils->getLastUsername(),
             'form' => $form->createView(),

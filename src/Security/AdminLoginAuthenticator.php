@@ -143,7 +143,6 @@ class AdminLoginAuthenticator extends AbstractFormLoginAuthenticator implements 
      */
     public function checkCredentials($credentials, UserInterface $user)
     {
-
         if (!$this->passwordEncoder->isPasswordValid($user, $credentials['password'])) {
             return false;
         }

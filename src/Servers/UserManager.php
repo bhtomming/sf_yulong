@@ -27,9 +27,19 @@ class UserManager
         $this->encoder = $encoder;
     }
 
-    public function createUser($username,$password = null,$roles = 'ROLE_USER')
+    public function createUser($username,$password = null,$role = 'ROLE_USER')
     {
         $user = new User();
+        $rols[] = $role;
+        if($role == 'ROLE_ADMIN')
+        {
+            $roles[] ='ROLE_USER';
+        }
+        if($role == 'ROLE_SUPER_ADMIN')
+        {
+            $roles[] = 'ROLE_ADMIN';
+            $roles[] = 'ROLE_USER';
+        }
         $user->setName($username)
             ->setPassword($this->updatePassword($user,$password))
             ->setRoles($roles)
@@ -42,6 +52,20 @@ class UserManager
     public function updatePassword(User $user,$password)
     {
         return $this->encoder->encodePassword($user,$password);
+    }
+
+    public function changePassword($username,$password)
+    {
+        $user = $this->loadUserByName($username);
+        $password = $this->updatePassword($user,$password);
+        $user->setPassword($password);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+    public function loadUserByName($name): ?User
+    {
+        return $this->entityManager->getRepository(User::class)->findOneBy(['name'=>$name]);
     }
 
 }

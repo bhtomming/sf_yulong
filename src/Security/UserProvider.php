@@ -44,7 +44,7 @@ class UserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        $user = $this->findOneUserBy($username);
+        $user = $this->findOneUserBy(['name'=>$username]);
         if(!$user){
             throw new UsernameNotFoundException(
                 sprintf(
@@ -95,7 +95,7 @@ class UserProvider implements UserProviderInterface
         return $class === User::class;
     }
 
-    public function findOneUserBy(array $options): ? User
+    public function findOneUserBy(array $options): ?User
     {
         return $this->entityManager->getRepository(User::class)->findOneBy($options);
     }
