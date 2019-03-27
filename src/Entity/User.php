@@ -62,6 +62,10 @@ final class User implements UserInterface
 
 
 
+    public function __construct()
+    {
+    }
+
     public function getId(): ?int
     {
         return $this->id;

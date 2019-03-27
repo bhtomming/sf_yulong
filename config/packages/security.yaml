@@ -49,8 +49,8 @@ security:
                 failure_path:   null
                 csrf_token_generator: security.csrf.token_manager
             logout:
-                path:           /
-                target:         /
+                path: /logout
+                target: app_login
             guard:
                 provider: wechat
                 authenticators:

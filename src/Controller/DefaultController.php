@@ -18,6 +18,7 @@ use App\Entity\PayLog;
 use App\Entity\PointsConfig;
 use App\Entity\Trade;
 use App\Entity\User;
+use App\Entity\WeChat;
 use App\Entity\WechatConfig;
 use App\Servers\MemberManager;
 use App\Servers\WeChatServer;
@@ -86,6 +87,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/cart/add/{goods_id}/{num}", name="add_cart")
      * @ParamConverter("goods", options={"mapping"={"id"="goods_id"}})
+     * @IsGranted("ROLE_USER")
      */
     public function addCart(Goods $goods, $num)
     {
@@ -107,6 +109,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/cart/del/{id}/{num}", name="remove_cart")
      * @ParamConverter("cart", options={"mapping"={"id"="id"}})
+     * @IsGranted("ROLE_USER")
      */
     public function removeCart(Cart $cart)
     {
@@ -132,6 +135,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/recommend/", name="recommend")
      * 推荐页面
+     * @IsGranted("ROLE_USER")
      */
     public function recommend(Request $request,WeChatServer $wechatServer)
     {
@@ -143,6 +147,25 @@ class DefaultController extends AbstractController
         //$image = $wechatServer->createQrcode($user->getWeChat());
         $image = "adfd";
         return $this->render("default/recommend.html.twig",['image'=>$image]);
+    }
+
+    /**
+     * @Route("/login_notify/", name="login_notify")
+     * 处理登录返回信息
+     */
+    public function loginNotify(WeChatServer $chatServer,Request $request)
+    {
+//$chatServer->register("oU2f4s568lSE0XvNTE4mXJq-ll_I");
+        $app = $chatServer->getApp();
+        $user = $app->oauth->user();
+        $wechat = $chatServer->getWechat($user->getId());
+        if(!$wechat instanceof WeChat)
+        {
+            //未注册用户要求先关注并注册
+            return $this->redirect("home_page");
+        }
+        $request->cookies->set('openId',$user->getId());
+        return $this->redirect('app_login');
     }
 
     /**

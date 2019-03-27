@@ -28,6 +28,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+
 class WeChatServer
 {
     private $em;
@@ -42,6 +43,8 @@ class WeChatServer
 
     private $app;
 
+    private $baseUrl;
+
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -50,6 +53,7 @@ class WeChatServer
         $this->curl = new Curl();
         $this->fileSystem = new Filesystem();
         $this->app = $this->getApp();
+        $this->baseUrl = "http://weixin.drupai.com";
     }
 
     public function getApp(): ? Application
@@ -97,28 +101,42 @@ class WeChatServer
         $weChat = new WeChat();
         $weChat->setOpenid($openId);
         $userInfo = $this->getUserInfo($openId);
+        $date = new \DateTime();
         $weChat
-            ->setNickName($userInfo->nickname)
-            ->setHeadImg($userInfo->headimgurl)
-            ->setCity($userInfo->city)
-            ->setSex($userInfo->sex)
-            ->setProvicne($userInfo->province)
-            ->setCountry($userInfo->country)
-            ->setSubscribeTime($userInfo->subscribe_time)
+            ->setNickName($userInfo['nickname'])
+            ->setHeadImg($userInfo['headimgurl'])
+            ->setCity($userInfo['city'])
+            ->setSex($userInfo['sex'])
+            ->setProvicne($userInfo['province'])
+            ->setCountry($userInfo['country'])
+            ->setSubscribe($userInfo['subscribe'] == 1)
+            ->setSubscribeTime($date->setTimestamp($userInfo['subscribe_time']))
         ;
         $username = date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 4, 8), 1))), 0, 5);
         $password = substr(md5(time()), 0, 8);
-        $userInfo = "您的账号：".$username."密码：".$password;
+        $userReply = "您的账号：".$username."密码：".$password;
+
+        $weChat->setPassword($password);
         $user->setName($username)
             ->setPassword($password)
             ->setMember($newMember)
             ->setWechat($weChat)
+            ->setRoles(['ROLE_USER'])
         ;
-        $this->returnData['content'] .= $userInfo;
-        $this->returnData['touser'] = $weChat->getOpenid();
         $this->em->persist($user);
         $this->em->flush();
+        $text = new Text($userReply);
+        $this->app->server->push(function($message) use ($text){
+            return $text;
+        });
+
         return $weChat;
+    }
+
+    public function getAuth()
+    {
+        $response = $this->app->oauth->scopes(['snsapi_base'])->redirect($this->baseUrl."/login_notify");
+        return $response;
     }
 
     //创建推荐二维码
@@ -221,8 +239,8 @@ class WeChatServer
     public function getUserInfo($openId)
     {
         $user = $this->app->user->get($openId);
-        $userInfo = json_decode($user);
-        return $userInfo;
+        //$userInfo = json_decode($user);
+        return $user;
     }
 
     //获取微信用户带参数二维码
@@ -471,7 +489,12 @@ class WeChatServer
 
     public function getWechat($openId): ? WeChat
     {
-        return $this->em->getRepository(WeChat::class)->findOneBy(['openid'=>$openId]);
+        $wechat = $this->em->getRepository(WeChat::class)->findOneBy(['openid'=>$openId]);
+        /*if(!$wechat instanceof WeChat)
+        {
+            $wechat = $this->register($openId);
+        }*/
+        return $wechat;
     }
 
 

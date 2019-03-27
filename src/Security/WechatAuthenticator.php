@@ -35,8 +35,9 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function supports(Request $request)
     {
-        return 'app_login' === $request->attributes->get('_route')
-            && $request->isMethod('POST');
+        //dump(preg_match("/^\/member\//i",$request->getPathInfo()));
+        //return preg_match("/^\/member\//i",$request->getPathInfo()) ? true : false;
+        return 'app_login' === $request->attributes->get('_route')&& $request->isMethod('POST');
     }
 
     public function getCredentials(Request $request)
