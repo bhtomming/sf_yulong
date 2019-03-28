@@ -18,16 +18,13 @@ class WechatSecurityController extends AbstractController
      */
     public function login(AuthenticationUtils $authenticationUtils,WeChatServer $wechatserver,Request $request): Response
     {
-        $openId = $request->cookies->get('openid');
-        if(!$openId)
+        $wechat  = $wechatserver->getWechatNoId();
+        //dump($openId);exit;
+        if(!$wechat)
         {
             return $wechatserver->getAuth();
         }
-        else {
-            $form = $this->createForm(MemberLoginForm::class);
-            $form->handleRequest($request);
-            $f = $form->createView();
-        }
+dump($wechat);exit;
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user

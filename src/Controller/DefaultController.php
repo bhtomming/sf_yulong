@@ -158,14 +158,16 @@ class DefaultController extends AbstractController
 //$chatServer->register("oU2f4s568lSE0XvNTE4mXJq-ll_I");
         $app = $chatServer->getApp();
         $user = $app->oauth->user();
-        $wechat = $chatServer->getWechat($user->getId());
+
+        $wechat = $chatServer->login($user->getId());
         if(!$wechat instanceof WeChat)
         {
             //未注册用户要求先关注并注册
-            return $this->redirect("home_page");
+            return $this->createAccessDeniedException("请先关注再登录");
         }
-        $request->cookies->set('openId',$user->getId());
-        return $this->redirect('app_login');
+        $request->cookies->set('openId',$wechat->getOpenid());
+
+        return $this->redirectToRoute('app_login');
     }
 
     /**

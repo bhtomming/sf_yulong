@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\WeChat;
+use App\Servers\WeChatServer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,17 +36,28 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function supports(Request $request)
     {
-        //dump(preg_match("/^\/member\//i",$request->getPathInfo()));
-        //return preg_match("/^\/member\//i",$request->getPathInfo()) ? true : false;
+        //return 'app_login' === $request->attributes->get('_route')&& $request->isMethod('POST');
+
+        if('app_login' === $request->attributes->get('_route')&& $request->cookies->get('openId'))
+        {
+            return true;
+        }
+
         return 'app_login' === $request->attributes->get('_route')&& $request->isMethod('POST');
     }
 
     public function getCredentials(Request $request)
     {
+        $openid = $request->cookies->get('openId');
+        if(!$openid)
+        {
+            $openid = $request->request->get('openid');
+        }
         $credentials = [
-            'openid' => $request->request->get('openid'),
+            'openid' => $openid,
             'password' => $request->request->get('password'),
             'csrf_token' => $request->request->get('_csrf_token'),
+            'wechat' => $request->request->get('openid') != null,
         ];
         $request->getSession()->set(
             Security::LAST_USERNAME,
@@ -57,9 +69,12 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $token = new CsrfToken('authenticate', $credentials['csrf_token']);
-        if (!$this->csrfTokenManager->isTokenValid($token)) {
-            throw new InvalidCsrfTokenException();
+        if(!$credentials['wechat'])
+        {
+            $token = new CsrfToken('authenticate', $credentials['csrf_token']);
+            if (!$this->csrfTokenManager->isTokenValid($token)) {
+                throw new InvalidCsrfTokenException();
+            }
         }
 
         $user = $this->entityManager->getRepository(WeChat::class)->findOneBy(['openid' => $credentials['openid']]);

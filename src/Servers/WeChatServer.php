@@ -39,11 +39,13 @@ class WeChatServer
 
     private $curl;
 
-    private $returnData;
+    private $wechat;
 
     private $app;
 
     private $baseUrl;
+
+
 
 
     public function __construct(EntityManagerInterface $em)
@@ -129,6 +131,7 @@ class WeChatServer
         $this->app->server->push(function($message) use ($text){
             return $text;
         });
+        $this->app->server->serve()->send();
 
         return $weChat;
     }
@@ -435,7 +438,7 @@ class WeChatServer
         if(!$curWechat instanceof WeChat)
         {   //新用户将自动注册
             $curWechat = $this->register($curOpenId);
-            $member = $curWechat->getUser()->getMember();
+            //$member = $curWechat->getUser()->getMember();
 
             //二维码中存在推荐人ID
             if(!empty($sceneId))
@@ -495,6 +498,24 @@ class WeChatServer
             $wechat = $this->register($openId);
         }*/
         return $wechat;
+    }
+
+    //微信登录
+    public function login($openid)
+    {
+        $this->wechat = $this->getWechat($openid);
+        return $this->wechat;
+    }
+
+    //是否已经登录
+    public function isLogin()
+    {
+        return $this->wechat instanceof WeChat;
+    }
+
+    public function getWechatNoId()
+    {
+        return $this->wechat;
     }
 
 
