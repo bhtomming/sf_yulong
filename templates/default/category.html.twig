@@ -27,11 +27,14 @@
             <a href="#tab3" class="tab-link button">销量</a>
             <a href="#tab4" class="tab-link button">价格</a>
         </div>
+        {% set goodes = category.goods %}
         <div class="tabs">
             <div id="tab1" class="tab">
+                {% for goods in goodes  %}
                 <div class="content-block">
-                    综合排序
+                    {{ goods.name }}
                 </div>
+                {% endfor %}
             </div>
             <div id="tab2" class="tab">
                 <div class="content-block">

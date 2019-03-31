@@ -270,6 +270,15 @@ class WeChat implements UserInterface
         return $this;
     }
 
+    public function hasRole($role)
+    {
+        if(!in_array($role,$this->roles,true))
+        {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Returns the password used to authenticate the user.
      *
@@ -338,5 +347,10 @@ class WeChat implements UserInterface
         $this->salt = $salt;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return "WeChat";
     }
 }

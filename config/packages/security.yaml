@@ -7,17 +7,15 @@ security:
             - ROLE_SONATA_PAGE_ADMIN_PAGE_EDIT
     encoders:
         App\Entity\User: bcrypt
+        App\Entity\WeChat: bcrypt
     providers:
-        #in_memory: { memory: ~ }
-        users:
-            id: App\Security\UserProvider
-
         wechat:
             id: App\Security\WechatProvider
-
-        all_users:
-            chain:
-                providers: ['wechat','users']
+        users:
+            id: App\Security\UserProvider
+#        all_users:
+#            chain:
+#                providers: ['wechat','users']
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -42,15 +40,15 @@ security:
         main:
             anonymous: ~
             form_login:
-                provider:       wechat
-                login_path:     app_login
-                use_forward:    false
-                check_path:     app_login
-                failure_path:   null
+                provider: wechat
+                login_path: app_login
+                use_forward: false
+                check_path:  app_login
+                failure_path: null
                 csrf_token_generator: security.csrf.token_manager
             logout:
-                path: /logout
-                target: app_login
+                path: logout
+                target: home_page
             guard:
                 provider: wechat
                 authenticators:

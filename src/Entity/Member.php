@@ -121,6 +121,11 @@ class Member
      */
     private $carts;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $refererImg;
+
 
 
     public function __construct()
@@ -597,6 +602,18 @@ class Member
                 $cart->setMember(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRefererImg(): ?string
+    {
+        return $this->refererImg;
+    }
+
+    public function setRefererImg(?string $refererImg): self
+    {
+        $this->refererImg = $refererImg;
 
         return $this;
     }

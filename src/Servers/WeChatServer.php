@@ -24,6 +24,7 @@ use EasyWeChat\Kernel\Messages\Text;
 use EasyWeChat\OfficialAccount\Application;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,10 +46,14 @@ class WeChatServer
 
     private $baseUrl;
 
+    private $container;
+
+    private $weManager;
 
 
 
-    public function __construct(EntityManagerInterface $em)
+
+    public function __construct(EntityManagerInterface $em,ContainerInterface $container,WechatManager $weManager)
     {
         $this->em = $em;
         $this->wechatConfig = $this->getWeChatConfig();
@@ -56,6 +61,8 @@ class WeChatServer
         $this->fileSystem = new Filesystem();
         $this->app = $this->getApp();
         $this->baseUrl = "http://weixin.drupai.com";
+        $this->container = $container;
+        $this->weManager = $weManager;
     }
 
     public function getApp(): ? Application
@@ -95,6 +102,13 @@ class WeChatServer
         return $this->em->getRepository(WechatConfig::class)->find(1);
     }
 
+    //更新微信用户信息
+    public function update(WeChat $weChat)
+    {
+        $this->em->persist($weChat);
+        $this->em->flush();
+    }
+
     //注册会员信息
     public function register($openId): ? WeChat
     {
@@ -118,7 +132,8 @@ class WeChatServer
         $password = substr(md5(time()), 0, 8);
         $userReply = "您的账号：".$username."密码：".$password;
 
-        $weChat->setPassword($password);
+        $weChat->setPassword($password)
+        ->setRoles(['ROLE_USER']);
         $user->setName($username)
             ->setPassword($password)
             ->setMember($newMember)
@@ -136,15 +151,28 @@ class WeChatServer
         return $weChat;
     }
 
+    //向微信获取网页授权
     public function getAuth()
     {
         $response = $this->app->oauth->scopes(['snsapi_base'])->redirect($this->baseUrl."/login_notify");
         return $response;
     }
 
+    //获取微信返回的用户信息
+    public function getAuthUser()
+    {
+        return $this->app->oauth->user();
+    }
+
     //创建推荐二维码
     public function createQrcode(WeChat $wechat)
     {
+        $wechat = $this->weManager->loadUserByName($wechat->getOpenid());
+        $member = $wechat->getUser()->getMember();
+        if(null != $refererImg = $member->getRefererImg())
+        {
+            return $refererImg;
+        }
         $qr_width = 255;  // 是二维码图片宽度
         $qr_height = 255; // 二维码图片高度
         $qr_x = 152;
@@ -153,36 +181,44 @@ class WeChatServer
         $hearimg_hight = 80;
         $hearimg_x = 80;
         $hearimg_y = 50;
-        $bg_img = "data/qrcode/1540239067195492735.jpg"; //合成图片的背景
+        $bg_img = "images/qrcode/1540239067195492735.jpg"; //合成图片的背景
         $text_red = 255;
         $text_geren = 0;
         $text_blue = 0;
 
         //===================================================================//
 
+        //用户头像文件名
         $fname = time().'jpg';
+        //图片的基本路径
+        $basePath = $this->get('kernel')->getProjectDir()."/public";
 
+        //创建用户头像文件并返回路径
         $h_imgsrc = $this->createFaceImg($wechat,$fname);
 
         $time = substr($fname,0,-4);
-        $qr_src = 'qrcode/scene/'.$wechat->getUser()->getId().".jpg";
-        $qr_imgs= "images/qrcode/".$time.".jpg";
+
+        //向微信获取用户二维码并保存到文件返回路径
+        $qr_src = $this->getQrcode($wechat->getId());
+
+        //要改变二维码的大小，需要重新命名
+        $qr_imgs= $basePath."/images/qrcode/scene/".$time."_".$wechat->getId().".jpg";
         //加载图片信息
         $target_qr =  imagecreatetruecolor($qr_width,$qr_height);
-        $source_qr = imagecreatefromjpeg(ROOT_PATH.$qr_src);
+        $source_qr = imagecreatefromjpeg($qr_src);
         //调整二维码大小
         Imagecopyresized($target_qr, $source_qr, 0, 0, 23, 23, $qr_width, $qr_height, 383, 383);
-        imagejpeg($target_qr,ROOT_PATH.$qr_imgs);
+        imagejpeg($target_qr,$qr_imgs);
         imagedestroy($target_qr);
         imagedestroy($source_qr);
 
 
-        $h_time=$time."_1";
+        $h_time= $basePath."/images/user_header/".$time."_1.jpg";
 
-        $h_name ='qrcode/'.$h_time.'.jpg';
+
         //判断 用户头像格式 转 JPG 格式,改变头像图片大小
-        if(!$this->fileSystem->exists('qrcode/'.$h_time.'.jpg')){
-            $h_name=resizejpg(ROOT_PATH.$h_imgsrc,$hearimg_width,$hearimg_hight,$h_time);
+        if($this->fileSystem->exists($h_imgsrc)){
+            $h_name=$this->resizejpg($h_imgsrc,$hearimg_width,$hearimg_hight,$h_time);
         }
 
         //头像
@@ -191,32 +227,36 @@ class WeChatServer
         //背景图片
         if(!$this->fileSystem->exists($bg_img) )
         {
-            $target =__DIR__. 'data/qrcode/tianxin100.jpg';//背景图片
+            $target = $basePath.'/images/qrcode/tianxin100.jpg';//背景图片
 
         }
-        $target =__DIR__  . $bg_img ;//背景图片 mobile下的qrcode 文件下
+        $target = $bg_img ;//背景图片 mobile下的qrcode 文件下
 
         $target_img = Imagecreatefromjpeg($target);
-        $source = Imagecreatefromjpeg(ROOT_PATH.$qr_imgs );
-        $h_source = Imagecreatefromjpeg(ROOT_PATH. $h_imgs);
+        $source = Imagecreatefromjpeg($qr_imgs );
+        $h_source = Imagecreatefromjpeg($h_imgs);
         imagecopy($target_img,$source,$qr_x,$qr_y,0,0,$qr_width,$qr_height);//创建二维码图片大小
         imagecopy($target_img,$h_source,$hearimg_x,$hearimg_y,0,0,$hearimg_width,$hearimg_hight);//创建头像大小
-        $fontfile =__DIR__. "data/qrcode/simsun.ttf";
+        $fontfile = $basePath."/images/qrcode/simsun.ttf";
 
         #水印文字 合成用户名
         $nickname = empty($wechat->getNickName())? $wechat->getUser()->getUsername() : $wechat->getNickName();
         #打水印
         $textcolor = imagecolorallocate($target_img, $text_red, $text_geren, $text_blue);
 
+        $recomImage = '/images/user_header/'.$time.'.jpg';
         imagettftext($target_img,18,0,188,129,$textcolor,$fontfile,$nickname);
-        Imagejpeg($target_img, __DIR__.'qrcode/'.$time.'.jpg');
+        Imagejpeg($target_img, $basePath.$recomImage);
 
         imagedestroy($target_img);
         imagedestroy($source);
         imagedestroy($h_source);
-        $s_data= $time.'.jpg';
 
-        return $s_data ;
+
+        $member->setRefererImg($recomImage);
+        $this->update($wechat);
+
+        return $recomImage ;
 
 
     }
@@ -226,12 +266,12 @@ class WeChatServer
     {
         $time = substr($fname,0,-4);
         //头像获取
-        $h_imgsrc= "/images/qrcode/head/".$time.".jpg";
+        $h_imgsrc= "images/user_header/".$time.".jpg";
 
         if( !$this->fileSystem->exists( $h_imgsrc) )
         {
             if(!$weChat->getHeadImg()){
-                $h_imgsrc = "data/qrcode/headImg.jpg";
+                $h_imgsrc = "images/qrcode/headImg.jpg";
             }
             $this->fileSystem->copy($weChat->getHeadImg(),$h_imgsrc,true);
         }
@@ -251,7 +291,7 @@ class WeChatServer
     {
         $qrUrl = $this->app->qrcode->forever($scene_id);
         $url = $this->app->qrcode->url($qrUrl['ticket']);
-        $imgPath = "qrcode/scene/{$scene_id}.jpg";
+        $imgPath = "images/qrcode/scene/{$scene_id}.jpg";
         $this->fileSystem->copy($url,$imgPath,true);
         return $imgPath;
     }
@@ -516,6 +556,50 @@ class WeChatServer
     public function getWechatNoId()
     {
         return $this->wechat;
+    }
+
+    public function get($server)
+    {
+        return $this->container->get($server);
+    }
+
+    public function resizejpg($imgsrc, $imgwidth, $imgheight, $path)
+    {
+        //$imgsrc jpg格式图像路径 $imgdst jpg格式图像保存文件名 $imgwidth要改变的宽度 $imgheight要改变的高度
+        //取得图片的宽度,高度值
+
+        $arr = getimagesize($imgsrc);
+        //header("Content-type: image/jpg");
+        $imgWidth = $imgwidth;
+        $imgHeight = $imgheight;
+        $imgsrc = imagecreatefromjpeg($imgsrc);//识别图像类型 创建类型图像
+        $image = imagecreatetruecolor($imgWidth, $imgHeight);//返回一个图像标识符，代表了一幅大小为 x_size 和 y_size 的黑色图像。
+        imagecopyresampled($image, $imgsrc, 0, 0, 0, 0, $imgWidth, $imgHeight, $arr[0], $arr[1]);
+        /*
+         bool imagecopyresampled ( resource $dst_image , resource $src_image , int $dst_x , int $dst_y , int $src_x , int $src_y , int $dst_w , int $dst_h , int $src_w , int $src_h )
+
+                $dst_image：新建的图片
+
+                $src_image：需要载入的图片
+
+                $dst_x：设定需要载入的图片在新图中的x坐标
+
+                $dst_y：设定需要载入的图片在新图中的y坐标
+
+                $src_x：设定载入图片要载入的区域x坐标
+
+                $src_y：设定载入图片要载入的区域y坐标
+
+                $dst_w：设定载入的原图的宽度（在此设置缩放）
+
+                $dst_h：设定载入的原图的高度（在此设置缩放）
+
+                $src_w：原图要载入的宽度
+
+                $src_h：原图要载入的高度
+    */
+        Imagejpeg($image, $path);
+        return $path;
     }
 
 

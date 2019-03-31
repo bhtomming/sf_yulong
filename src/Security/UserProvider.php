@@ -12,6 +12,7 @@ namespace App\Security;
 
 
 use App\Entity\User;
+use App\Entity\WeChat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -53,6 +54,7 @@ class UserProvider implements UserProviderInterface
                 )
             );
         }
+        dump($user);exit;
         return $user;
     }
 
@@ -71,15 +73,25 @@ class UserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
+
+        if($user instanceof WeChat)
+        {
+            //dump($user->getPassword());exit;
+            return $user;
+        }
         assert($user instanceof User);
+
+
         if(null === $relodedUser = $this->findOneUserBy(['id' => $user->getId()])){
             throw new UsernameNotFoundException(
                 sprintf(
                     'User with id %s is not be reload',
-                            $user->getId()
-                    )
+                    $user->getId()
+                )
             );
         }
+
+
         return $relodedUser;
     }
 

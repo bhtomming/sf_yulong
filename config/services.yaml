@@ -36,6 +36,12 @@ services:
         arguments:
             $entityManager: '%doctrine.entity_managers%'
 
+    app.wechat.manager:
+        class: App\Servers\WechatManager
+        arguments:
+            $entityManager: '%doctrine.entity_managers%'
+
+
 
     admin.goods:
         class: App\Admin\GoodsAdmin

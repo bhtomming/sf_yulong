@@ -64,7 +64,7 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/list/{id}", name="goods_list")
-     * @ParamConverter("category", options={"mapping"={"id"="id"}})
+     *
      * 按分类显示商品
      */
     public function goodsList(Category $category)
@@ -75,7 +75,7 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/goods/{id}", name="goods_show")
-     * @ParamConverter("goods", options={"mapping"={"id"="id"}})
+     *
      * 商品详情页面
      */
     public function goodsShow(Goods $goods)
@@ -86,7 +86,7 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/cart/add/{goods_id}/{num}", name="add_cart")
-     * @ParamConverter("goods", options={"mapping"={"id"="goods_id"}})
+     *
      * @IsGranted("ROLE_USER")
      */
     public function addCart(Goods $goods, $num)
@@ -108,7 +108,7 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/cart/del/{id}/{num}", name="remove_cart")
-     * @ParamConverter("cart", options={"mapping"={"id"="id"}})
+     *
      * @IsGranted("ROLE_USER")
      */
     public function removeCart(Cart $cart)
@@ -156,10 +156,12 @@ class DefaultController extends AbstractController
     public function loginNotify(WeChatServer $chatServer,Request $request)
     {
 //$chatServer->register("oU2f4s568lSE0XvNTE4mXJq-ll_I");
-        $app = $chatServer->getApp();
-        $user = $app->oauth->user();
 
-        $wechat = $chatServer->login($user->getId());
+
+        //$user = $chatServer->getAuthUser();
+        //$openid = $user->getId();
+        $openid = "oU2f4s568lSE0XvNTE4mXJq-ll_I";
+        $wechat = $chatServer->login($openid);
         if(!$wechat instanceof WeChat)
         {
             //未注册用户要求先关注并注册
@@ -167,7 +169,8 @@ class DefaultController extends AbstractController
         }
         $request->cookies->set('openId',$wechat->getOpenid());
 
-        return $this->redirectToRoute('app_login');
+        //dump($wechat->getOpenid());exit;
+        return $this->redirectToRoute('app_login',['openid'=>$openid]);
     }
 
     /**

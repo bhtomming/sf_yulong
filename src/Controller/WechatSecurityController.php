@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\WeChat;
 use App\Form\MemberLoginForm;
 use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,18 +19,38 @@ class WechatSecurityController extends AbstractController
      */
     public function login(AuthenticationUtils $authenticationUtils,WeChatServer $wechatserver,Request $request): Response
     {
-        $wechat  = $wechatserver->getWechatNoId();
-        //dump($openId);exit;
-        if(!$wechat)
+        $openid = $request->get('openid');
+        if(null == $openid)
         {
-            return $wechatserver->getAuth();
+            if($request->cookies->get("request") != null)
+            {
+                exit;
+            }
+            $request->cookies->set("request",1);
+            //测试使用
+            return $this->redirectToRoute("login_notify");
+            //return $wechatserver->getAuth();
         }
-dump($wechat);exit;
+        $wechat  = $wechatserver->getWechat($openid);
+
+        if(!$wechat instanceof WeChat)
+        {
+            throw $this->createAccessDeniedException("请先关注再进来");
+        }
+
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+    }
+
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logoutAction(): void
+    {
+        // Left empty intentionally because this will be handled by Symfony.
     }
 }

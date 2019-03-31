@@ -30,7 +30,7 @@ class UserManager
     public function createUser($username,$password = null,$role = 'ROLE_USER')
     {
         $user = new User();
-        $rols[] = $role;
+        $roles[] = $role;
         if($role == 'ROLE_ADMIN')
         {
             $roles[] ='ROLE_USER';

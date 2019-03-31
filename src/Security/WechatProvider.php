@@ -10,8 +10,10 @@
 namespace App\Security;
 
 
+use App\Entity\User;
 use App\Entity\WeChat;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -48,13 +50,18 @@ class WechatProvider implements UserProviderInterface
                 $username
             ));
         }
+        if(!$user->getSubscribe())
+        {
+            throw new CustomUserMessageAuthenticationException("请先关注再登录");
+        }
+
         return $user;
     }
 
     /**
      * Refreshes the user.
      *
-     * It is up to the implementation to decide if the user data should be
+     * It is up to the implementation to decide if the user images should be
      * totally reloaded (e.g. from the database), or if the UserInterface
      * object can just be merged into some internal array of users / identity
      * map.
@@ -66,7 +73,12 @@ class WechatProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
+        if($user instanceof User)
+        {
+            return $user;
+        }
         assert($user instanceof WeChat);
+
         if(null === $reloader = $this->findOneBy(['id'=>$user->getId()]))
         {
             throw new UsernameNotFoundException(sprintf(
@@ -74,6 +86,7 @@ class WechatProvider implements UserProviderInterface
                 $user->getId()
             ));
         }
+
         return $reloader;
     }
 
@@ -91,6 +104,6 @@ class WechatProvider implements UserProviderInterface
 
     public function findOneBy(array $options): ?WeChat
     {
-        $this->em->getRepository(WeChat::class)->findOneBy($options);
+        return $this->em->getRepository(WeChat::class)->findOneBy($options);
     }
 }

@@ -25,3 +25,6 @@ yarn-error.log
 
 /public/logs/
 /public/tmp/
+/public/images/qrcode/scene
+/public/images/user_header
+/public/images/

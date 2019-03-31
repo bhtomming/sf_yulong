@@ -3,7 +3,6 @@
 namespace App\Security;
 
 use App\Entity\WeChat;
-use App\Servers\WeChatServer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +37,7 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
     {
         //return 'app_login' === $request->attributes->get('_route')&& $request->isMethod('POST');
 
-        if('app_login' === $request->attributes->get('_route')&& $request->cookies->get('openId'))
+        if('app_login' === $request->attributes->get('_route')&& $request->get('openid'))
         {
             return true;
         }
@@ -48,8 +47,9 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getCredentials(Request $request)
     {
-        $openid = $request->cookies->get('openId');
-        if(!$openid)
+        $openid = $request->get('openid');
+
+        if($openid == null)
         {
             $openid = $request->request->get('openid');
         }
@@ -69,7 +69,7 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        if(!$credentials['wechat'])
+        if($credentials['wechat'])
         {
             $token = new CsrfToken('authenticate', $credentials['csrf_token']);
             if (!$this->csrfTokenManager->isTokenValid($token)) {
@@ -91,17 +91,24 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
     {
         // Check the user's password or other credentials and return true or false
         // If there are no credentials to check, you can just return true
-        throw new \Exception('TODO: check the credentials inside '.__FILE__);
+
+        if($user->hasRole("ROLE_USER"))
+        {
+            return true;
+        }
+        throw new CustomUserMessageAuthenticationException("You don't have permission to access that page.");
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }
+        return new RedirectResponse($this->urlGenerator->generate('home_page'));
 
         // For example : return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
     protected function getLoginUrl()

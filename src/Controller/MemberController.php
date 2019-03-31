@@ -10,6 +10,7 @@
 namespace App\Controller;
 
 
+use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -35,9 +36,12 @@ class MemberController extends AbstractController
     /**
      * @Route("/salelink", name="member_sale_link")
      */
-    public function saleLink()
+    public function saleLink(WeChatServer $wechatServer)
     {
+        $wechat = $this->getUser();
+        $image = $wechatServer->createQrcode($wechat);
 
+        return $this->render("member/recommend.html.twig",['image'=>$image]);
     }
 
     /**
