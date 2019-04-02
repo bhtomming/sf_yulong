@@ -73,6 +73,7 @@ class WechatProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
+
         if($user instanceof User)
         {
             return $user;
