@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block body %}
+    {% set goodes = goodses %}
+    {% set rgoods = goodses|object_sort('sorter') %}
+    {% set sgoods = goodses|object_sort('sale','DESC') %}
+    {% set pgoods = goodses|object_sort('price') %}
     <div class="content">
         <div class="content-padded">
             <div class="row">
@@ -19,33 +23,43 @@
                 </div>
             </div>
         </div>
-
         <div class="buttons-tab">
             <a href="#tab1" class="tab-link button active">综合</a>
             <a href="#tab2" class="tab-link button">人气</a>
             <a href="#tab3" class="tab-link button">销量</a>
             <a href="#tab4" class="tab-link button">价格</a>
         </div>
+
         <div class="tabs">
             <div id="tab1" class="tab active">
-                <div class="content-block">
-                    综合排序
-                </div>
+                {% for goods in goodes  %}
+                    <div class="content-block">
+                        {{ goods.name }}
+                    </div>
+                {% endfor %}
             </div>
             <div id="tab2" class="tab">
                 <div class="content-block">
-                    <p>按人气排序</p>
+                    {% for goods in rgoods  %}
+                        <div class="content-block">
+                            <p>{{ goods.name }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
             <div id="tab3" class="tab">
-                <div class="content-block">
-                    <p>按销量排序</p>
-                </div>
+                {% for goods in sgoods  %}
+                    <div class="content-block">
+                        <p>{{ goods.name }}</p>
+                    </div>
+                {% endfor %}
             </div>
             <div id="tab4" class="tab">
-                <div class="content-block">
-                    <p>按价格排序</p>
-                </div>
+                {% for goods in pgoods  %}
+                    <div class="content-block">
+                        <p>{{ goods.name }}</p>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

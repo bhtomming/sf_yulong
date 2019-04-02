@@ -27,6 +27,7 @@
             <a href="#tab3" class="tab-link button">销量</a>
             <a href="#tab4" class="tab-link button">价格</a>
         </div>
+
         {% set goodes = category.goods %}
         <div class="tabs">
             <div id="tab1" class="tab">
@@ -37,19 +38,28 @@
                 {% endfor %}
             </div>
             <div id="tab2" class="tab">
-                <div class="content-block">
-                    <p>按人气排序</p>
-                </div>
+                {% set rgoods = goodes|object_sort('sorter') %}
+                {% for goods in rgoods  %}
+                    <div class="content-block">
+                        <p>{{ goods.name }}</p>
+                    </div>
+                {% endfor %}
             </div>
             <div id="tab3" class="tab">
+                {% set sgoods = goodes|object_sort('sale','DESC') %}
+                {% for goods in sgoods  %}
                 <div class="content-block">
-                    <p>按销量排序</p>
+                    <p>{{ goods.name }}</p>
                 </div>
+                {% endfor %}
             </div>
             <div id="tab4" class="tab">
-                <div class="content-block">
-                    <p>按价格排序</p>
-                </div>
+                {% set pgoods = goodes|object_sort('price') %}
+                {% for goods in pgoods  %}
+                    <div class="content-block">
+                        <p>{{ goods.name }}</p>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
