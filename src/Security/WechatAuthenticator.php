@@ -56,8 +56,9 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
         $credentials = [
             'openid' => $openid,
             'password' => $request->request->get('password'),
-            'csrf_token' => $request->request->get('_csrf_token'),
-            'wechat' => $request->request->get('openid') != null,
+            'csrf_token' => $request->query->get('_csrf_token'),
+            //'csrf_token' => $request->request->get('_csrf_token'),
+           // 'wechat' => $request->request->get('openid') != null,
         ];
         $request->getSession()->set(
             Security::LAST_USERNAME,
@@ -69,12 +70,10 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        if($credentials['wechat'])
-        {
-            $token = new CsrfToken('authenticate', $credentials['csrf_token']);
-            if (!$this->csrfTokenManager->isTokenValid($token)) {
-                throw new InvalidCsrfTokenException();
-            }
+
+        $token = new CsrfToken('authenticate', $credentials['csrf_token']);
+        if (!$this->csrfTokenManager->isTokenValid($token)) {
+            throw new InvalidCsrfTokenException();
         }
 
         $user = $this->entityManager->getRepository(WeChat::class)->findOneBy(['openid' => $credentials['openid']]);

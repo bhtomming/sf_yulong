@@ -64,49 +64,49 @@
             <div class="list-block">
                 <ul>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("sale_center")}}"  class="item-link item-content"  >
                             <div class="item-inner">
                                 <div class="item-title">分销中心</div>
                             </div>
                         </a>
                     </li>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("member_edit",{ 'id' : app.user.id}) }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">用户信息</div>
                             </div>
                         </a>
                     </li>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("order_list") }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">我的订单</div>
                             </div>
                         </a>
                     </li>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("address_list") }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">收货地址</div>
                             </div>
                         </a>
                     </li>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("reply_list") }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">我的留言</div>
                             </div>
                         </a>
                     </li>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("assess_list") }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">我的评论</div>
                             </div>
                         </a>
                     </li>
                     <li>
-                        <a class="item-link item-content">
+                        <a href="{{ path("logout") }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">退出登录</div>
                             </div>

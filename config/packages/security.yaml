@@ -37,22 +37,40 @@ security:
                 provider: users
                 authenticators:
                     - App\Security\AdminLoginAuthenticator
-        main:
-            anonymous: ~
+        wechat:
+            pattern:            /member(.*)
             form_login:
-                provider: wechat
-                login_path: app_login
-                use_forward: false
-                check_path:  app_login
-                failure_path: null
+                provider:       wechat
+                login_path:     app_login
+                use_forward:    false
+                check_path:     app_login
+                failure_path:   null
                 csrf_token_generator: security.csrf.token_manager
             logout:
-                path: logout
-                target: home_page
+                path:           logout
+                target:         home_page
+            anonymous:          true
             guard:
                 provider: wechat
                 authenticators:
                     - App\Security\WechatAuthenticator
+        main:
+            anonymous: ~
+#            form_login:
+#                provider: wechat
+#                login_path: app_login
+#                use_forward: false
+#                check_path:  app_login
+#                failure_path: null
+#                csrf_token_generator: security.csrf.token_manager
+#            logout:
+#                path: logout
+#                target: home_page
+            guard:
+                provider: wechat
+                authenticators:
+                    - App\Security\WechatAuthenticator
+
             # activate different ways to authenticate
 
             # http_basic: true

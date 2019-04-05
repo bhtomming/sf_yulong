@@ -10,101 +10,44 @@
 namespace App\Security;
 
 
-use App\Entity\User;
-use App\Entity\WeChat;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use App\Contracts\WechatUserProvider;
+use App\Security\Token\WechatUserToken;
+use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class WechatProvider implements UserProviderInterface
+
+
+class WechatProvider implements AuthenticationProviderInterface
 {
-    private $em;
+    private $userProvider;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(WechatUserProvider $userProvider)
     {
-        $this->em = $em;
+        $this->userProvider = $userProvider;
     }
 
-    /**
-     * Loads the user for the given username.
-     *
-     * This method must throw UsernameNotFoundException if the user is not
-     * found.
-     *
-     * @param string $username The username
-     *
-     * @return UserInterface
-     *
-     * @throws UsernameNotFoundException if the user is not found
-     */
-    public function loadUserByUsername($username)
+
+
+    public function authenticate(TokenInterface $token): WechatUserToken
     {
-        $user = $this->findOneBy(['openid' => $username]);
+        $user = $this->userProvider->find($token->getAttribute('openid'));
         if(!$user)
         {
-            throw new UsernameNotFoundException(sprintf(
-                "没有找到您的会员信息 %s",
-                $username
-            ));
+            throw new UsernameNotFoundException("找不到用户名");
         }
-        if(!$user->getSubscribe())
-        {
-            throw new CustomUserMessageAuthenticationException("请先关注再登录");
-        }
+        $token->setUser($user);
 
-        return $user;
+        return $token;
     }
 
     /**
-     * Refreshes the user.
+     * Checks whether this provider supports the given token.
      *
-     * It is up to the implementation to decide if the user images should be
-     * totally reloaded (e.g. from the database), or if the UserInterface
-     * object can just be merged into some internal array of users / identity
-     * map.
-     *
-     * @return UserInterface
-     *
-     * @throws UnsupportedUserException  if the user is not supported
-     * @throws UsernameNotFoundException if the user is not found
+     * @return bool true if the implementation supports the Token, false otherwise
      */
-    public function refreshUser(UserInterface $user)
+    public function supports(TokenInterface $token)
     {
-
-        if($user instanceof User)
-        {
-            return $user;
-        }
-        assert($user instanceof WeChat);
-
-        if(null === $reloader = $this->findOneBy(['id'=>$user->getId()]))
-        {
-            throw new UsernameNotFoundException(sprintf(
-                "找不到用户ID：%s",
-                $user->getId()
-            ));
-        }
-
-        return $reloader;
-    }
-
-    /**
-     * Whether this provider supports the given user class.
-     *
-     * @param string $class
-     *
-     * @return bool
-     */
-    public function supportsClass($class)
-    {
-        return $class === WeChat::class;
-    }
-
-    public function findOneBy(array $options): ?WeChat
-    {
-        return $this->em->getRepository(WeChat::class)->findOneBy($options);
+        return $token instanceof WechatUserToken;
     }
 }

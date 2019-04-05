@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block header %}
+    <header class="bar bar-nav">
+        <h1 class="title">我的信息</h1>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <form method="post">
+            <h1 class="h3 mb-3 font-weight-normal">修改信息</h1>
+            <label for="inputUsername" class="sr-only">用户名</label>
+            <input type="text" value="" name="username" id="username" class="form-control" placeholder="用户名" required autofocus>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="密码" required>
+
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('_token') }}"
+            >
+
+
+            <button class="btn btn-lg btn-primary" type="submit">
+                确定修改
+            </button>
+        </form>
+    </div>
+{% endblock %}

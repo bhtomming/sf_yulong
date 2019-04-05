@@ -28,6 +28,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Yansongda\Pay\Pay;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
@@ -153,7 +155,7 @@ class DefaultController extends AbstractController
      * @Route("/login_notify/", name="login_notify")
      * 处理登录返回信息
      */
-    public function loginNotify(WeChatServer $chatServer,Request $request)
+    public function loginNotify(WeChatServer $chatServer,Request $request, CsrfTokenManagerInterface $csrfManager)
     {
 //$chatServer->register("oU2f4s568lSE0XvNTE4mXJq-ll_I");
 
@@ -161,6 +163,8 @@ class DefaultController extends AbstractController
         //$user = $chatServer->getAuthUser();
         //$openid = $user->getId();
         $openid = "oU2f4s568lSE0XvNTE4mXJq-ll_I";
+
+        $csrfToken = $csrfManager->refreshToken("authenticate");
         $wechat = $chatServer->login($openid);
         if(!$wechat instanceof WeChat)
         {
@@ -170,7 +174,7 @@ class DefaultController extends AbstractController
         $request->cookies->set('openId',$wechat->getOpenid());
 
         //dump($wechat->getOpenid());exit;
-        return $this->redirectToRoute('app_login',['openid'=>$openid]);
+        return $this->redirectToRoute('app_login',['openid'=>$openid,'_csrf_token'=>$csrfToken]);
     }
 
     /**
