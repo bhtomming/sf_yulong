@@ -1,0 +1,27 @@
+services:
+    security.authentication.wechat_provider:
+        class: App\Security\WechatProvider
+        public: false
+        abstract: true
+
+    security.authentication.wechat_listener:
+        class: App\Security\Firewall\WechatListener
+        arguments:
+          - $tokenStorage: '@security.token_storage'
+          - $authenticationManager: '@security.authentication.manager'
+          - $httpUtils: '@security.http_utils'
+          - $sdk: '@lilocon.wechat.sdk'
+          - $event_dispatcher: '@event_dispatcher'
+
+    wechat.factory.easywechat_factory:
+          class: App\Factory\WeChatFactory
+    lilocon.wechat.sdk:
+        class: EasyWeChat\OfficialAccount\Application
+        tags:
+            name : monolog.logger
+            channel: wechat
+        factory: 'wechat.factory.easywechat_factory'
+
+    app_wechat_user_provider:
+        class: App\Security\WechatProvider
+        arguments: ['@service_container']

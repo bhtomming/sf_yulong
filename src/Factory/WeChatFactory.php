@@ -10,7 +10,8 @@
 namespace App\Factory;
 
 
-use EasyWeChat\BasicService\Application;
+
+use EasyWeChat\OfficialAccount\Application;
 use Psr\Log\LoggerInterface;
 
 class WeChatFactory

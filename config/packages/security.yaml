@@ -39,6 +39,7 @@ security:
                     - App\Security\AdminLoginAuthenticator
         wechat:
             pattern:            /member(.*)
+
             form_login:
                 provider:       wechat
                 login_path:     app_login
