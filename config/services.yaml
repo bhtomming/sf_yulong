@@ -29,7 +29,7 @@ services:
     weixin.server:
         class: App\Servers\WeChatServer
         arguments:
-            $em: '%doctrine.entity_managers%'
+            $em: '@doctrine.orm.entity_manager'
 
     app.user.manager:
         class: App\Servers\UserManager

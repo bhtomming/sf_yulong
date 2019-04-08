@@ -7,21 +7,34 @@ services:
     security.authentication.wechat_listener:
         class: App\Security\Firewall\WechatListener
         arguments:
-          - $tokenStorage: '@security.token_storage'
-          - $authenticationManager: '@security.authentication.manager'
-          - $httpUtils: '@security.http_utils'
-          - $sdk: '@lilocon.wechat.sdk'
-          - $event_dispatcher: '@event_dispatcher'
+          $tokenStorage: '@security.token_storage'
+          $authenticationManager: '@security.authentication.manager'
+          $httpUtils: '@security.http_utils'
+          $sdk: '@lilocon.wechat.sdk'
+          $event_dispatcher: '@event_dispatcher'
+          $options: {}
 
     wechat.factory.easywechat_factory:
-          class: App\Factory\WeChatFactory
+        class: App\Factory\WeChatFactory
+
     lilocon.wechat.sdk:
         class: EasyWeChat\OfficialAccount\Application
         tags:
             name : monolog.logger
             channel: wechat
-        factory: 'wechat.factory.easywechat_factory'
+        factory: ['@wechat.factory.easywechat_factory','createNewInstance']
+        arguments:
+            $server: '@weixin.server'
+            $logger: '@logger'
+
 
     app_wechat_user_provider:
-        class: App\Security\WechatProvider
+        class: App\Security\Provider\WechatUserProvider
         arguments: ['@service_container']
+
+    app.events.wechat_event_subscriber:
+        class: App\Events\WechatEventSubscriber
+        arguments: ['@service_container']
+        tags:
+            - { name: kernel.event_subscriber }
+

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\WeChat;
+use App\Events\WechatEventSubscriber;
 use App\Form\MemberLoginForm;
 use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,5 +53,18 @@ class WechatSecurityController extends AbstractController
     public function logoutAction(): void
     {
         // Left empty intentionally because this will be handled by Symfony.
+    }
+
+    /**
+     * @Route("/wechat/authorize", name="member_login")
+     * 普通用户登录页面
+     */
+
+    public function authorize()
+    {
+        /*$user = $wechatserver->getAuthUser();
+        $openid = $user->getId();*/
+        WechatEventSubscriber::getSubscribedEvents();
+        return $this->redirectToRoute("member_center");
     }
 }

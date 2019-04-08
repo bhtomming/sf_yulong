@@ -21,7 +21,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         admin:
-            pattern:            /admin(.*)
+            pattern: ^/admin(.*)
             form_login:
                 provider:       users
                 login_path:     admin_login
@@ -38,25 +38,32 @@ security:
                 authenticators:
                     - App\Security\AdminLoginAuthenticator
         wechat:
-            pattern:            /member(.*)
+            anonymous: ~
+            pattern:   ^/member(.*)
+            stateless: true
+            provider: wechat
+            wechat_login:
+                default_redirect: /member
+                authorize_path: /wechat/authorize
 
-            form_login:
-                provider:       wechat
-                login_path:     app_login
-                use_forward:    false
-                check_path:     app_login
-                failure_path:   null
-                csrf_token_generator: security.csrf.token_manager
-            logout:
-                path:           logout
-                target:         home_page
-            anonymous:          true
-            guard:
-                provider: wechat
-                authenticators:
-                    - App\Security\WechatAuthenticator
+#            form_login:
+#                provider:       wechat
+#                login_path:     app_login
+#                use_forward:    false
+#                check_path:     app_login
+#                failure_path:   null
+#                csrf_token_generator: security.csrf.token_manager
+#            logout:
+#                path:           logout
+#                target:         home_page
+#            anonymous:          true
+#            guard:
+#                provider: wechat
+#                authenticators:
+#                    - App\Security\WechatAuthenticator
         main:
             anonymous: ~
+
 #            form_login:
 #                provider: wechat
 #                login_path: app_login

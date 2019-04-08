@@ -31,7 +31,7 @@ class WechatUserProvider implements \App\Contracts\WechatUserProvider
     public function find($openid)
     {
         return $this->container->get('doctrine.orm.default_entity_manager')
-            ->getRepository('AppBundle:User')
+            ->getRepository('App:WeChat')
             ->findOneBy(['openid' => $openid]);
     }
 }

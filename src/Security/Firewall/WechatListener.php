@@ -34,7 +34,7 @@ class WechatListener implements ListenerInterface
     protected $tokenStorage;
 
     /**
-     * @var \Lilocon\WechatBundle\Security\Authentication\Provider\WechatProvider
+     *
      */
     protected $authenticationManager;
 
@@ -43,7 +43,7 @@ class WechatListener implements ListenerInterface
      */
     protected $options = array(
         'authorize_path' => '/wechat/authorize',
-        'default_redirect' => '/wechat',
+        'default_redirect' => '/member',
     );
 
     /**
@@ -113,7 +113,7 @@ class WechatListener implements ListenerInterface
 
         $token = $this->tokenStorage->getToken();
 
-        if(!$token){
+        if($token !== null){
             $this->authenticationManager->authenticate($token);
             $this->tokenStorage->setToken($token);
 
