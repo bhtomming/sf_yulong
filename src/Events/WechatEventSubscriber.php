@@ -13,6 +13,7 @@ namespace App\Events;
 use App\Entity\WeChat;
 use App\Event\AuthorizeEvent;
 use App\Event\Events;
+use App\Servers\WeChatServer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -47,7 +48,7 @@ class WechatEventSubscriber implements EventSubscriberInterface
      */
     public function authorize(AuthorizeEvent $event)
     {
-        dump($event);exit;
+
         $wx_user = $event->getUser();
 
         $manager = $this->container->get('doctrine.orm.default_entity_manager');
@@ -57,11 +58,13 @@ class WechatEventSubscriber implements EventSubscriberInterface
 
         // 若无此用户则写入数据库
         if (!$user) {
-            $user = new WeChat();
+            $weServer = new WeChatServer($manager);
+            $weServer->register($wx_user['openid']);
+            /*$user = new WeChat();
             $user->setOpenid($wx_user['openid']);
             $user->setNickname($wx_user['nickname']);
             $manager->persist($user);
-            $manager->flush();
+            $manager->flush();*/
         }
     }
 }

@@ -9,8 +9,8 @@ security:
         App\Entity\User: bcrypt
         App\Entity\WeChat: bcrypt
     providers:
-        wechat:
-            id: App\Security\WechatProvider
+        wechat_user:
+            id: App\Security\Authentication\Provider\WechatProvider
         users:
             id: App\Security\UserProvider
 #        all_users:
@@ -41,10 +41,10 @@ security:
             anonymous: ~
             pattern:   ^/member(.*)
             stateless: true
-            provider: wechat
+            provider: wechat_user
             wechat_login:
-                default_redirect: /member
-                authorize_path: /wechat/authorize
+                default_redirect: /home_page
+                authorize_path: /member/authorize
 
 #            form_login:
 #                provider:       wechat
@@ -75,7 +75,7 @@ security:
 #                path: logout
 #                target: home_page
             guard:
-                provider: wechat
+                provider: wechat_user
                 authenticators:
                     - App\Security\WechatAuthenticator
 
@@ -93,6 +93,7 @@ security:
         - { path: ^/admin/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/logout$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: [ROLE_ADMIN, ROLE_SONATA_ADMIN] }
+        - { path: ^/member/authorize$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/.*, role: IS_AUTHENTICATED_ANONYMOUSLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

@@ -2,17 +2,18 @@
 /**
  * Created by PhpStorm.
  * User: 烽行天下
- * Date: 2019/4/6
- * Time: 17:59
+ * Date: 2019/4/9
+ * Time: 17:31
  * Site: http://www.drupai.com
  */
 
-namespace App\Security\Provider;
+namespace App\Providers;
 
 
+use App\Contracts\WechatUserProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class WechatUserProvider implements \App\Contracts\WechatUserProvider
+class UserProvider implements WechatUserProvider
 {
     /**
      * @var ContainerInterface
@@ -28,6 +29,11 @@ class WechatUserProvider implements \App\Contracts\WechatUserProvider
         $this->container = $container;
     }
 
+    /**
+     * 根据openid获取用户
+     * @param $openid
+     * @return \App\Entity\WeChat|null|object
+     */
     public function find($openid)
     {
         return $this->container->get('doctrine.orm.default_entity_manager')

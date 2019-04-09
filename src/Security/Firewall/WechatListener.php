@@ -14,8 +14,10 @@ use App\Event\AuthorizeEvent;
 use App\Event\Events;
 use App\Security\Token\WechatUserToken;
 use EasyWeChat\OfficialAccount\Application;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -24,6 +26,7 @@ use Symfony\Component\Security\Core\Event\AuthenticationEvent;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
+use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 class WechatListener implements ListenerInterface
 {
     const REDIRECT_URL_KEY = '_wechat.redirect_url';
@@ -42,7 +45,7 @@ class WechatListener implements ListenerInterface
      * @var array
      */
     protected $options = array(
-        'authorize_path' => '/wechat/authorize',
+        'authorize_path' => '/member/authorize',
         'default_redirect' => '/member',
     );
 
@@ -89,14 +92,16 @@ class WechatListener implements ListenerInterface
         if($this->httpUtils->checkRequestPath($request,$this->options['authorize_path']))
         {
             $user = $oauth->user()->getOriginal();
-
+echo "1";
             $wechatAuthorizeEvent = new AuthorizeEvent($user);
+
+
             $this->event_dispatcher->dispatch(Events::AUTHORIZE,$wechatAuthorizeEvent);
 
             $token = new WechatUserToken($user['openid'],['ROLE_USER','ROLE_WECHAT_USER']);
 
             $this->tokenStorage->setToken($token);
-
+dump($this->tokenStorage);exit;
             $this->event_dispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_SUCCESS,new AuthenticationEvent($token));
 
 

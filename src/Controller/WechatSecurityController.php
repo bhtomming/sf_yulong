@@ -55,16 +55,13 @@ class WechatSecurityController extends AbstractController
         // Left empty intentionally because this will be handled by Symfony.
     }
 
+
     /**
-     * @Route("/wechat/authorize", name="member_login")
+     * @Route("/member/authorize", name="member_login")
      * 普通用户登录页面
      */
-
-    public function authorize()
+    public function authorize(): void
     {
-        /*$user = $wechatserver->getAuthUser();
-        $openid = $user->getId();*/
-        WechatEventSubscriber::getSubscribedEvents();
-        return $this->redirectToRoute("member_center");
+
     }
 }

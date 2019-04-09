@@ -53,7 +53,7 @@ class WeChatServer
 
 
 
-    public function __construct(EntityManagerInterface $em,ContainerInterface $container,WechatManager $weManager)
+    public function __construct(EntityManagerInterface $em,ContainerInterface $container = null,WechatManager $weManager = null)
     {
         $this->em = $em;
         $this->wechatConfig = $this->getWeChatConfig();

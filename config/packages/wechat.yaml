@@ -1,8 +1,9 @@
 services:
     security.authentication.wechat_provider:
-        class: App\Security\WechatProvider
+        class: App\Security\Authentication\Provider\WechatProvider
         public: false
         abstract: true
+        arguments: ["@app_wechat_user_provider"]
 
     security.authentication.wechat_listener:
         class: App\Security\Firewall\WechatListener
@@ -29,7 +30,7 @@ services:
 
 
     app_wechat_user_provider:
-        class: App\Security\Provider\WechatUserProvider
+        class: App\Providers\UserProvider
         arguments: ['@service_container']
 
     app.events.wechat_event_subscriber:
