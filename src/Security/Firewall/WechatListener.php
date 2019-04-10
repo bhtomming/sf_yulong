@@ -86,13 +86,13 @@ class WechatListener implements ListenerInterface
         $request = $event->getRequest();
         $session = $request->getSession();
 
-        $oauth = $this->sdk->oauth;
+        //$oauth = $this->sdk->oauth;
 
         //授权页面
-        if($this->httpUtils->checkRequestPath($request,$this->options['authorize_path']))
+        /*if($this->httpUtils->checkRequestPath($request,$this->options['authorize_path']))
         {
             $user = $oauth->user()->getOriginal();
-echo "1";
+
             $wechatAuthorizeEvent = new AuthorizeEvent($user);
 
 
@@ -101,7 +101,7 @@ echo "1";
             $token = new WechatUserToken($user['openid'],['ROLE_USER','ROLE_WECHAT_USER']);
 
             $this->tokenStorage->setToken($token);
-dump($this->tokenStorage);exit;
+
             $this->event_dispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_SUCCESS,new AuthenticationEvent($token));
 
 
@@ -114,21 +114,21 @@ dump($this->tokenStorage);exit;
             return;
 
 
-        }
+        }*/
 
-        $token = $this->tokenStorage->getToken();
+        /*$token = $this->tokenStorage->getToken();
 
         if($token !== null){
             $this->authenticationManager->authenticate($token);
             $this->tokenStorage->setToken($token);
 
             return;
-        }
+        }*/
 
         // 未授权, 重定向到微信授权页面
         $session->set(self::REDIRECT_URL_KEY, $request->getUri());
-        $target_url = $request->getUriForPath($this->options['authorize_path']);
+        /*$target_url = $request->getUriForPath($this->options['authorize_path']);
         $response = $oauth->scopes(['snsapi_userinfo'])->redirect($target_url);
-        $event->setResponse($response);
+        $event->setResponse($response);*/
     }
 }

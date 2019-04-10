@@ -10,7 +10,7 @@ security:
         App\Entity\WeChat: bcrypt
     providers:
         wechat_user:
-            id: App\Security\Authentication\Provider\WechatProvider
+            id: App\Security\WechatProvider
         users:
             id: App\Security\UserProvider
 #        all_users:
@@ -37,17 +37,12 @@ security:
                 provider: users
                 authenticators:
                     - App\Security\AdminLoginAuthenticator
-        wechat:
-            anonymous: ~
-            pattern:   ^/member(.*)
-            stateless: true
-            provider: wechat_user
-            wechat_login:
-                default_redirect: /home_page
-                authorize_path: /member/authorize
-
+#        wechat:
+#            anonymous: ~
+#            pattern:   ^/member(.*)
+#            provider: wechat_user
 #            form_login:
-#                provider:       wechat
+#                provider:       wechat_user
 #                login_path:     app_login
 #                use_forward:    false
 #                check_path:     app_login
@@ -57,23 +52,22 @@ security:
 #                path:           logout
 #                target:         home_page
 #            anonymous:          true
-#            guard:
-#                provider: wechat
-#                authenticators:
-#                    - App\Security\WechatAuthenticator
+ #           guard:
+ #               provider: wechat_user
+ #               authenticators:
+ #                   - App\Security\WechatAuthenticator
         main:
             anonymous: ~
-
-#            form_login:
-#                provider: wechat
-#                login_path: app_login
-#                use_forward: false
-#                check_path:  app_login
-#                failure_path: null
-#                csrf_token_generator: security.csrf.token_manager
-#            logout:
-#                path: logout
-#                target: home_page
+            form_login:
+                provider: wechat_user
+                login_path: app_login
+                use_forward: false
+                check_path:  app_login
+                failure_path: null
+                csrf_token_generator: security.csrf.token_manager
+            logout:
+                path: logout
+                target: home_page
             guard:
                 provider: wechat_user
                 authenticators:

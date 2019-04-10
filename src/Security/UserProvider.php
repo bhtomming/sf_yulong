@@ -54,7 +54,7 @@ class UserProvider implements UserProviderInterface
                 )
             );
         }
-        dump($user);exit;
+
         return $user;
     }
 
@@ -76,7 +76,6 @@ class UserProvider implements UserProviderInterface
 
         if($user instanceof WeChat)
         {
-            //dump($user->getPassword());exit;
             return $user;
         }
         assert($user instanceof User);

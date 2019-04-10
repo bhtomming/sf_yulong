@@ -134,47 +134,25 @@ class DefaultController extends AbstractController
         return $this->render("default/cart_list.html.twig",['carts'=>$carts]);
     }
 
-    /**
-     * @Route("/recommend/", name="recommend")
-     * 推荐页面
-     * @IsGranted("ROLE_USER")
-     */
-    public function recommend(Request $request,WeChatServer $wechatServer)
-    {
-        $wechatServer->get_oauth2_code($request);
-        $user = $this->getUser();
-        if(!$user instanceof User){
-            $this->redirectToRoute("login");
-        }
-        //$image = $wechatServer->createQrcode($user->getWeChat());
-        $image = "adfd";
-        return $this->render("default/recommend.html.twig",['image'=>$image]);
-    }
 
     /**
      * @Route("/login_notify/", name="login_notify")
      * 处理登录返回信息
      */
-    public function loginNotify(WeChatServer $chatServer,Request $request, CsrfTokenManagerInterface $csrfManager)
+    public function loginNotify(WeChatServer $chatServer)
     {
-//$chatServer->register("oU2f4s568lSE0XvNTE4mXJq-ll_I");
-
-
         //$user = $chatServer->getAuthUser();
         //$openid = $user->getId();
         $openid = "oU2f4s568lSE0XvNTE4mXJq-ll_I";
 
-        $csrfToken = $csrfManager->refreshToken("authenticate");
         $wechat = $chatServer->login($openid);
         if(!$wechat instanceof WeChat)
         {
             //未注册用户要求先关注并注册
             return $this->createAccessDeniedException("请先关注再登录");
         }
-        $request->cookies->set('openId',$wechat->getOpenid());
 
-        //dump($wechat->getOpenid());exit;
-        return $this->redirectToRoute('app_login',['openid'=>$openid,'_csrf_token'=>$csrfToken]);
+        return $this->redirectToRoute('app_login',['openid'=>$openid]);
     }
 
     /**
@@ -243,6 +221,7 @@ class DefaultController extends AbstractController
             }
             $tradeNo = $data['out_trade_no'];
             $em = $this->getDoctrine()->getManager();
+            
             $trade = $em->getRepository(Trade::class)->findOneBy(['tradeNo' => $tradeNo]);
             if(!$trade instanceof Trade){
                 return;

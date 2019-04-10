@@ -56,7 +56,7 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
         $credentials = [
             'openid' => $openid,
             'password' => $request->request->get('password'),
-            'csrf_token' => $request->query->get('_csrf_token'),
+            'csrf_token' => $this->csrfTokenManager->refreshToken('_csrf_token'),
             //'csrf_token' => $request->request->get('_csrf_token'),
            // 'wechat' => $request->request->get('openid') != null,
         ];
@@ -70,20 +70,7 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-
-        $token = new CsrfToken('authenticate', $credentials['csrf_token']);
-        if (!$this->csrfTokenManager->isTokenValid($token)) {
-            throw new InvalidCsrfTokenException();
-        }
-
-        $user = $this->entityManager->getRepository(WeChat::class)->findOneBy(['openid' => $credentials['openid']]);
-
-        if (!$user) {
-            // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('用户不存在');
-        }
-
-        return $user;
+        return $userProvider->loadUserByUsername($credentials['openid']);
     }
 
     public function checkCredentials($credentials, UserInterface $user)
@@ -104,10 +91,12 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }
-        return new RedirectResponse($this->urlGenerator->generate('home_page'));
+        $session = $request->getSession();
 
-        // For example : return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        $url = $session->get("_security.wechat.target_path") ? : $request->getUriForPath('home_page');
+
+        return new RedirectResponse($url);
+
     }
 
     protected function getLoginUrl()
