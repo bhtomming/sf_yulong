@@ -14,6 +14,7 @@ namespace App\Admin;
 
 use App\Entity\Category;
 use App\Entity\Goods;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -50,7 +51,7 @@ final class GoodsAdmin extends AbstractAdmin
                 'label'=>'分类',
                 'choice_label'=>'name'
             ])
-            ->add('description',null,['label'=>'详细描述'])
+            ->add('description',CKEditorType::class,['label'=>'详细描述','config'=>['toolbar'=>'full']])
         ;
     }
 

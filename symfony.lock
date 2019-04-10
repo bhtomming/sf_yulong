@@ -86,6 +86,18 @@
     "easywechat-composer/easywechat-composer": {
         "version": "1.1.6"
     },
+    "friendsofsymfony/ckeditor-bundle": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.0",
+            "ref": "8eb1cd0962ded6a6d6e1e5a9b6d3e888f9f94ff6"
+        },
+        "files": [
+            "./config/packages/fos_ckeditor.yaml"
+        ]
+    },
     "guzzlehttp/guzzle": {
         "version": "6.3.3"
     },
@@ -95,14 +107,46 @@
     "guzzlehttp/psr7": {
         "version": "1.5.2"
     },
+    "imagine/imagine": {
+        "version": "v0.7.1"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
+    },
+    "jms/metadata": {
+        "version": "1.7.0"
+    },
+    "jms/parser-lib": {
+        "version": "1.0.0"
+    },
+    "jms/serializer": {
+        "version": "1.13.0"
+    },
+    "jms/serializer-bundle": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.0",
+            "ref": "fe60ce509ef04a3f40da96e3979bc8d9b13b2372"
+        },
+        "files": [
+            "./config/packages/dev/jms_serializer.yaml",
+            "./config/packages/jms_serializer.yaml",
+            "./config/packages/prod/jms_serializer.yaml"
+        ]
+    },
+    "knplabs/gaufrette": {
+        "version": "v0.8.1"
     },
     "knplabs/knp-menu": {
         "version": "2.3.0"
     },
     "knplabs/knp-menu-bundle": {
         "version": "v2.2.1"
+    },
+    "kriswallsmith/buzz": {
+        "version": "v0.16.1"
     },
     "monolog/monolog": {
         "version": "1.24.0"
@@ -131,6 +175,9 @@
     "overtrue/wechat": {
         "version": "4.1.20"
     },
+    "phpcollection/phpcollection": {
+        "version": "0.5.0"
+    },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
     },
@@ -139,6 +186,9 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "0.4.0"
+    },
+    "phpoption/phpoption": {
+        "version": "1.5.0"
     },
     "pimple/pimple": {
         "version": "v3.2.3"
@@ -203,8 +253,25 @@
     "sonata-project/doctrine-orm-admin-bundle": {
         "version": "3.8.2"
     },
+    "sonata-project/easy-extends-bundle": {
+        "version": "2.5.0"
+    },
     "sonata-project/exporter": {
         "version": "2.0.1"
+    },
+    "sonata-project/media-bundle": {
+        "version": "3.13",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.13",
+            "ref": "e25412e53b20827db07abb6f2aa0b8e4d26c284c"
+        },
+        "files": [
+            "./config/packages/sonata_media.yaml",
+            "./config/routes/sonata_media.yaml",
+            "./public/upload/media/.gitignore"
+        ]
     },
     "symfony/asset": {
         "version": "v4.2.3"
@@ -443,6 +510,9 @@
     },
     "symfony/yaml": {
         "version": "v4.2.1"
+    },
+    "tilleuls/ckeditor-sonata-media-bundle": {
+        "version": "v1.0.8"
     },
     "twig/extensions": {
         "version": "1.0",
