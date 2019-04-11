@@ -1417,7 +1417,7 @@ cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-ckeditor@^4.0.0:
+ckeditor@^4.11.4:
   version "4.11.4"
   resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.11.4.tgz#5edbc235808f9e0f562e8e642eeb04fa1b01b633"
   integrity sha512-h1EymdwFDdQuDO1vEisUagZ/WYiDnvvvtftYmbmqbbUf9vk21ovXb7mXnQimvTYJfRQBgJCoqfjFDfcQIfw9ig==
