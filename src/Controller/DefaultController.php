@@ -12,10 +12,12 @@ namespace App\Controller;
 
 use App\Entity\Cart;
 use App\Entity\Category;
+use App\Entity\Exchange;
 use App\Entity\Goods;
 use App\Entity\GoodsSnapshot;
 use App\Entity\PayLog;
 use App\Entity\PointsConfig;
+use App\Entity\PointsLog;
 use App\Entity\Trade;
 use App\Entity\User;
 use App\Entity\WeChat;
@@ -229,27 +231,54 @@ class DefaultController extends AbstractController
             }
             $tradeNo = $data['out_trade_no'];
             $em = $this->getDoctrine()->getManager();
-            
-            $trade = $em->getRepository(Trade::class)->findOneBy(['tradeNo' => $tradeNo]);
-            if(!$trade instanceof Trade){
-                return;
+            $payType = $data['attach'];
+
+            switch ($payType){
+                case "CZ":
+                    //充值处理
+                    $exchange = $em->getRepository(Exchange::class)->findOneBy(['changeNo' => $tradeNo]);
+                    if(!$exchange instanceof Exchange)
+                    {
+                        echo 'invalidate';
+                        return false;
+                    }
+                    //处理充值金额
+                    $member = $exchange->getMember();
+                    $member->addAmount($exchange->getAmount());
+                    $exchange->setStatus("已到账");
+                    $amountLog = new PointsLog();
+                    $amountLog->setAmount($exchange->getAmount())
+                        ->setChangeReason("微信充值")
+                        ->setMember($member);
+                    break;
+
+                default:
+                    //普通订单处理
+                    $trade = $em->getRepository(Trade::class)->findOneBy(['tradeNo' => $tradeNo]);
+                    if(!$trade instanceof Trade){
+                        echo 'invalidate';
+                        return false;
+                    }
+                    $points = $trade->getGivePoints();
+
+                    $trade->setStatus(Trade::PAIED);
+                    $member = $trade->getMember();
+
+                    $payLog = new PayLog();
+                    $payLog->setPoints($points)
+                        ->setStatus("微信支付")
+                        ->setPayNo($data['transaction_id'])
+                        ->setPayTime(new \DateTime('now'))
+                        ->setTotalFee($data['cash_fee'])
+                        ->setMember($member);
+                    $trade->setPayLog($payLog);
+                    $memberManager = new MemberManager($em);
+                    //分配订单积分
+                    $memberManager->distribute($member,$points);
+                    break;
             }
-            $points = $trade->getGivePoints();
-            $payLog = new PayLog();
-            $trade->setStatus(Trade::PAIED);
-            $member = $trade->getMember();
-
-
-            $payLog->setPoints($points)
-                ->setStatus("微信支付")
-                ->setPayNo($data['transaction_id'])
-                ->setPayTime(new \DateTime('now'))
-                ->setTotalFee($data['cash_fee'])
-                ->setMember($member);
-            $trade->setPayLog($payLog);
-            $memberManager = new MemberManager($em);
-            //分配订单积分
-            $memberManager->distribute($member,$points);
+            $em->persist($member);
+            $em->flush();
 
             Log::debug('Wechat notify', $data->all());
         } catch (\Exception $e) {
@@ -259,6 +288,8 @@ class DefaultController extends AbstractController
         return $pay->success()->send();
 
     }
+
+
 
     /**
      * @Route("/wechat", name="wx_api")

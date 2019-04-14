@@ -165,6 +165,13 @@ class Member
         return $this;
     }
 
+    public function addAmount($amount): self
+    {
+        $this->amount += $amount;
+
+        return $this;
+    }
+
     public function getPoints()
     {
         return $this->points;

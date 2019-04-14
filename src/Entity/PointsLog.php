@@ -44,6 +44,8 @@ class PointsLog
     public function __construct()
     {
         $this->setChangeTime(new \DateTime('now'));
+        $this->amount = 0;
+        $this->points = 0;
     }
 
     public function getId(): ?int
