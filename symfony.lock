@@ -483,6 +483,9 @@
     "willdurand/negotiation": {
         "version": "v2.3.1"
     },
+    "wythe/logistics": {
+        "version": "v0.0.3"
+    },
     "yansongda/pay": {
         "version": "v2.6.2"
     },

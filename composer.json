@@ -23,6 +23,7 @@
         "symfony/webpack-encore-bundle": "^1.2",
         "symfony/yaml": "4.2.*",
         "twig/extensions": "^1.5",
+        "wythe/logistics": "^0.0.3",
         "yansongda/pay": "^2.6"
     },
     "config": {

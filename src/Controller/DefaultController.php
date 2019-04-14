@@ -32,6 +32,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Wythe\Logistics\Logistics;
 use Yansongda\Pay\Pay;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
@@ -287,6 +288,18 @@ class DefaultController extends AbstractController
 
         return $pay->success()->send();
 
+    }
+
+    /**
+     * @Route("/logistics", name="logistics")
+     * 微信服务监听页面
+     */
+    public function logistics()
+    {
+        $logistics = new Logistics();
+        $info = $logistics->query('73111467572929','ickd');
+        dump($info);
+        exit;
     }
 
 
