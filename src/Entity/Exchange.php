@@ -42,6 +42,28 @@ class Exchange
      */
     private $member;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $changeNo;
+
+    public function __construct()
+    {
+        $this->changeNo = "CZ".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+        $this->exchangeType = "微信充值";
+        $this->status = "未到账";
+        $this->createdTime = new \DateTime('now');
+    }
+
+    public function getPayInfo(){
+        return array(
+            'out_trade_no' => $this->getChangeNo(),
+            'total_fee' => $this->amount * 100, // 订单金额**单位：分**
+            'body' => '支付玉泷网络服务',
+            'attach' => 'CZ',
+        );
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +126,18 @@ class Exchange
     public function setMember(?Member $member): self
     {
         $this->member = $member;
+
+        return $this;
+    }
+
+    public function getChangeNo(): ?string
+    {
+        return $this->changeNo;
+    }
+
+    public function setChangeNo(string $changeNo): self
+    {
+        $this->changeNo = $changeNo;
 
         return $this;
     }

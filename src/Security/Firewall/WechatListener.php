@@ -85,7 +85,8 @@ class WechatListener implements ListenerInterface
     {
         $request = $event->getRequest();
         $session = $request->getSession();
-
+        // 未授权, 重定向到微信授权页面
+        $session->set(self::REDIRECT_URL_KEY, $request->getUri());
         //$oauth = $this->sdk->oauth;
 
         //授权页面
@@ -125,8 +126,7 @@ class WechatListener implements ListenerInterface
             return;
         }*/
 
-        // 未授权, 重定向到微信授权页面
-        $session->set(self::REDIRECT_URL_KEY, $request->getUri());
+
         /*$target_url = $request->getUriForPath($this->options['authorize_path']);
         $response = $oauth->scopes(['snsapi_userinfo'])->redirect($target_url);
         $event->setResponse($response);*/

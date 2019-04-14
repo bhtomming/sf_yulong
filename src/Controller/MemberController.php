@@ -10,13 +10,20 @@
 namespace App\Controller;
 
 
+use App\Entity\Exchange;
 use App\Entity\WeChat;
+use App\Entity\WechatConfig;
+use App\Form\ExchangeForm;
 use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+use Yansongda\Pay\Pay;
 
 /**
  * Class MemberController
@@ -54,9 +61,29 @@ class MemberController extends AbstractController
      * @Route("/exchange", name="member_exchange")
      * 充值页面
      */
-    public function exchange()
+    public function exchange(Request $request)
     {
-        return $this->render("member/exchange.html.twig");
+        $form = $this->createForm(ExchangeForm::class,new Exchange());
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $data = $form->getData();
+
+            $config = $this->getWechatPayConfig();
+            $info = $data->getPayInfo();
+            $info['openid'] = $this->getWechat()->getOpenid();
+            $info['notify_url'] = $this->generateUrl("wx_respond",[], UrlGeneratorInterface::ABSOLUTE_URL);
+            dump($config);exit;
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($data);
+            $em->flush();
+            $pay = Pay::wechat($config)->mp($info);
+
+            return $this->redirectToRoute('member_center');
+        }
+
+        return $this->render("member/exchange.html.twig",[
+            'form' => $form->createView()
+        ]);
     }
 
 
@@ -123,7 +150,7 @@ class MemberController extends AbstractController
         return $this->render("member/assess_list.html.twig");
     }
 
-    public function getWechat()
+    public function getWechat(): ? WeChat
     {
         return $this->getUser();
     }
@@ -136,6 +163,13 @@ class MemberController extends AbstractController
     public function getMember()
     {
         return $this->getUser()->getMember();
+    }
+
+    public function getWechatPayConfig()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $wechatConfig = $em->getRepository(WechatConfig::class)->find(1);
+        return $wechatConfig->getPayConfig();
     }
 
 }

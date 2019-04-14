@@ -7,6 +7,16 @@
 
 {% block body %}
     <div class="content">
+        {{ form_start(form) }}
+        <label for="amount" class="sr-only">Openid</label>
+            {{ form_row(form.amount) }}
+        <input type="hidden" name="_csrf_token"
+               value="{{ csrf_token('authenticate') }}"
+        >
+        <button class="btn btn-lg btn-primary" type="submit">
+            确认充值
+        </button>
+            {{ form_end(form) }}
 
     </div>
 {% endblock %}

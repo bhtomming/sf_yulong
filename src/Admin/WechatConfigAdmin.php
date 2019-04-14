@@ -19,7 +19,7 @@ class WechatConfigAdmin extends AbstractAdmin
 {
     public function configureListFields(ListMapper $list)
     {
-        $list->add('appid',null,['label'=>'appid'])
+        $list->addIdentifier('appid',null,['label'=>'appid'])
             ->add('appscret',null,['label'=>'appscret'])
             ->add('token',null,['label'=>'token'])
             ->add('reply',null,['label'=>'关注回复'])

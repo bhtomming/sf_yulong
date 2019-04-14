@@ -44,10 +44,12 @@ class DefaultController extends AbstractController
         $em = $this->getDoctrine()->getManager();
 
         $categoryHotel = $em->getRepository(Category::class)->find(1);
+        if($categoryHotel instanceof Category)
+        {
+            $categoryHotel = $categoryHotel->getGoodsBySort();
+        }
 
-        $hts = $categoryHotel->getGoodsBySort();
-
-        return $this->render('default/index.html.twig',['hts' => $hts]);
+        return $this->render('default/index.html.twig',['hts' => $categoryHotel]);
     }
 
 
@@ -144,12 +146,18 @@ class DefaultController extends AbstractController
         //$user = $chatServer->getAuthUser();
         //$openid = $user->getId();
         $openid = "oU2f4s568lSE0XvNTE4mXJq-ll_I";
+        if($openid == null){
+            //未关注用户要求先关注并注册
+            $this->addFlash('error','请先关注再登录');
+            return $this->render("exceptions/access_exception.html.twig");
+        }
 
         $wechat = $chatServer->login($openid);
+
         if(!$wechat instanceof WeChat)
         {
-            //未注册用户要求先关注并注册
-            return $this->createAccessDeniedException("请先关注再登录");
+            //未注册用户自动帮注册
+            $chatServer->register($openid);
         }
 
         return $this->redirectToRoute('app_login',['openid'=>$openid]);

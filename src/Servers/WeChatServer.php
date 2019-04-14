@@ -143,10 +143,11 @@ class WeChatServer
         $this->em->persist($user);
         $this->em->flush();
         $text = new Text($userReply);
-        $this->app->server->push(function($message) use ($text){
+        $this->app->customer_service->message($text)->to($openId)->send();
+        /*$this->app->server->push(function($message) use ($text){
             return $text;
         });
-        $this->app->server->serve()->send();
+        $this->app->server->serve()->send();*/
 
         return $weChat;
     }
@@ -507,7 +508,7 @@ class WeChatServer
                 $parentWechat = $parentMember->getUser()->getWechat();
                 $news = new News($items);
                 //向用户的上级发送消息
-                $this->app->customer_service->message($news)->to($parentWechat->getOpenid())->send;
+                $this->app->customer_service->message($news)->to($parentWechat->getOpenid())->send();
 
                 $shop_name = "玉泷商城";
 

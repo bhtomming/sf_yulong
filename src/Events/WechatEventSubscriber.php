@@ -58,6 +58,7 @@ class WechatEventSubscriber implements EventSubscriberInterface
 
         // 若无此用户则写入数据库
         if (!$user) {
+            dump($user);exit;
             $weServer = new WeChatServer($manager);
             $weServer->register($wx_user['openid']);
             /*$user = new WeChat();
