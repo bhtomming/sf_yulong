@@ -21,9 +21,4 @@ return [
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
     FOS\CKEditorBundle\FOSCKEditorBundle::class => ['all' => true],
-    Sonata\EasyExtendsBundle\SonataEasyExtendsBundle::class => ['all' => true],
-    JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
-    Sonata\MediaBundle\SonataMediaBundle::class => ['all' => true],
-    CoopTilleuls\Bundle\CKEditorSonataMediaBundle\CoopTilleulsCKEditorSonataMediaBundle::class => ['all' => true],
-    App\Application\Sonata\MediaBundle\ApplicationSonataMediaBundle::class => ['all' => true],
 ];

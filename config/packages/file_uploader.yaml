@@ -1,0 +1,4 @@
+parameters:
+    app.path.article_images: /upload/images
+
+

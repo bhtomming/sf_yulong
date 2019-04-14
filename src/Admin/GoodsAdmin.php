@@ -52,6 +52,7 @@ final class GoodsAdmin extends AbstractAdmin
                 'choice_label'=>'name'
             ])
             ->add('description',CKEditorType::class,['label'=>'详细描述','config'=>['toolbar'=>'full']])
+
         ;
     }
 

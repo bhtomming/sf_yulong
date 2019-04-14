@@ -16,7 +16,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Application,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -43,51 +43,6 @@ services:
 
 
 
-    admin.goods:
-        class: App\Admin\GoodsAdmin
-        arguments: [~, App\Entity\Goods, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 商品管理, label: 商品信息,icon: '<i class="fa fa-shopping-cart"></i>' }
 
-    admin.category:
-        class: App\Admin\CategoryAdmin
-        arguments: [~, App\Entity\Category, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 商品管理, label: 分类管理 }
 
-    admin.cash:
-        class: App\Admin\CashAdmin
-        arguments: [~, App\Entity\Cash, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 财务管理, label: 提现信息,icon: '<i class="fa fa-shopping-bag"></i>' }
-
-    admin.exchange:
-        class: App\Admin\ExchangeAdmin
-        arguments: [~, App\Entity\Exchange, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 财务管理, label: 充值信息 }
-
-    admin.member:
-        class: App\Admin\MemberAdmin
-        arguments: [~, App\Entity\Member, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 会员管理, label: 会员信息,icon: '<i class="fa fa-users"></i>' }
-
-    admin.trade:
-        class: App\Admin\TradeAdmin
-        arguments: [~, App\Entity\Trade, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 商品管理, label: 订单信息}
-
-    admin.wechatconfig:
-        class: App\Admin\WechatConfigAdmin
-        arguments: [~, App\Entity\WechatConfig, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: 系统设置, label: 微信配置,icon: '<i class="fa fa-server"></i>' }
-
-    admin.pointsconfig:
-        class: App\Admin\PointsConfigAdmin
-        arguments: [~, App\Entity\PointsConfig, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm,group: '积分管理', label: 积分设置,icon: '<i class="fa fa-bitcoin"></i>' }
 

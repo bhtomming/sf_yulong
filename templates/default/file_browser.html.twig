@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+    <title></title>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags("app") }}
+    {% endblock %}
+    {% block headjavascript %}
+        {{ encore_entry_script_tags("ckbrowser") }}
+    {% endblock %}
+</head>
+<body>
+
+{% block body %}
+    <div class="navbar sticky-top navbar-light" style="background-color: #e3f2fd;">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-warning mr-3" id="modify" data-toggle="modal" data-target="#modifyModal" data-action="{{ path('file_mod') }}" >修改名称</button>
+                <button class="btn btn-outline-danger mr-3" id="del" data-action="{{ path('file_del') }}">删除图片</button>
+                <button type="button" class="btn btn-outline-primary" id="sure" >确定选择</button>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-3">
+        <div class="row">
+            {% for image in images %}
+                <div class="col-2 px-1 mb-2">
+                    <div class="card">
+                        <img src="{{ image.path }}" class="card-img-top" title="{{ image.name }}" width="158" height="104" />
+                        <div class="card-body">
+                            <h4 class="card-title text-center text-truncate">{{ image.name }}</h4>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="modifyModal" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="modifyModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modifyModalLabel">修改</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="label" for="name-input">名称</label>
+                            <input type="text" class="form-control" name="name-input" id="name-input">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block javascripts %}
+
+{% endblock %}
+</body>
+</html>

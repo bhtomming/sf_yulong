@@ -14,16 +14,16 @@ fos_ck_editor:
             language: zh_CN
             toolbar: full
 
-            filebrowserBrowseRoute: admin_sonata_media_media_browser
-            filebrowserImageBrowseRoute: admin_sonata_media_media_browser
+#            filebrowserBrowseRoute: file_view
+#            filebrowserImageBrowseRoute: file_view
                 # Display images by default when clicking the image dialog browse button
-            filebrowserImageBrowseRouteParameters:
-                provider: sonata.media.provider.image
-            filebrowserUploadRoute: admin_sonata_media_media_upload
-            filebrowserUploadRouteParameters:
-                provider: sonata.media.provider.file
+ #           filebrowserImageBrowseRouteParameters: []
+#                provider: sonata.media.provider.image
+            filebrowserUploadRoute: file_upload
+#            filebrowserUploadRouteParameters:
+#                provider: sonata.media.provider.file
                 # Upload file as image when sending a file from the image dialog
-            filebrowserImageUploadRoute: admin_sonata_media_media_upload
-            filebrowserImageUploadRouteParameters:
-                provider: sonata.media.provider.image
-                context: default # Optional, to upload in a custom context
+            filebrowserImageUploadRoute: file_upload
+#            filebrowserImageUploadRouteParameters:
+#                provider: sonata.media.provider.image
+#                context: default # Optional, to upload in a custom context
