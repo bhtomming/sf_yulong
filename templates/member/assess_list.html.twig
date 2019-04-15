@@ -7,6 +7,34 @@
 
 {% block body %}
 <div class="content">
+    <div class="list-block media-list">
+        <ul>
+            {% for assess in assesses %}
+                <li>
+                    <a href="#" class="item-link item-content">
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">评论商品：</div>
+                                <div class="item-after">{{ reply.goods.name }}</div>
+                            </div>
+                            <div class="item-subtitle">评论时间：{{ reply.createTime }}</div>
+                            <div class="item-text">评论内容:{{ reply.comment }}</div>
+                        </div>
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ path('member_center') }}" class="item-link item-content">
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">还没有评论信息</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
 
+        </ul>
+    </div>
 </div>
-{% endblcok %}
+{% endblock %}

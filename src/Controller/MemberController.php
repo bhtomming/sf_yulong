@@ -10,9 +10,13 @@
 namespace App\Controller;
 
 
+use App\Entity\Address;
 use App\Entity\Exchange;
+use App\Entity\Member;
+use App\Entity\User;
 use App\Entity\WeChat;
 use App\Entity\WechatConfig;
+use App\Form\AddressForm;
 use App\Form\ExchangeForm;
 use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -129,7 +133,33 @@ class MemberController extends AbstractController
      */
     public function addressList()
     {
-        return $this->render("member/address_list.html.twig");
+        $addreses = $this->getMember()->getAddress();
+        return $this->render("member/address_list.html.twig",['addresses' => $addreses]);
+    }
+
+    /**
+     * @Route("/address/add", name="address_add")
+     * 添加收货地址
+     */
+    public function addAddress(Request $request)
+    {
+        $member = $this->getMember();
+        $address = new Address();
+        $form = $this->createForm(AddressForm::class,$address);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $address = $form->getData();
+            $member->addAddress($address);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($member);
+            $em->flush();
+            return $this->redirectToRoute("address_list");
+        }
+
+        return $this->render('member/address_add.html.twig',[
+            'form'=>$form->createView(),
+            'member' => $member
+        ]);
     }
 
     /**
@@ -138,7 +168,8 @@ class MemberController extends AbstractController
      */
     public function replyList()
     {
-        return $this->render("member/address_list.html.twig");
+        $replies = $this->getMember()->getReplies();
+        return $this->render("member/reply_list.html.twig",['replies'=>$replies]);
     }
 
     /**
@@ -147,7 +178,8 @@ class MemberController extends AbstractController
      */
     public function assessList()
     {
-        return $this->render("member/assess_list.html.twig");
+        $assesses = $this->getMember()->getAssess();
+        return $this->render("member/assess_list.html.twig",['assesses'=>$assesses]);
     }
 
     public function getWechat(): ? WeChat
@@ -155,14 +187,14 @@ class MemberController extends AbstractController
         return $this->getUser();
     }
 
-    public function getWUser()
+    public function getWUser(): ?User
     {
         return $this->getWechat()->getUser();
     }
 
-    public function getMember()
+    public function getMember(): ?Member
     {
-        return $this->getUser()->getMember();
+        return $this->getWUser()->getMember();
     }
 
     public function getWechatPayConfig()
@@ -171,5 +203,7 @@ class MemberController extends AbstractController
         $wechatConfig = $em->getRepository(WechatConfig::class)->find(1);
         return $wechatConfig->getPayConfig();
     }
+
+
 
 }

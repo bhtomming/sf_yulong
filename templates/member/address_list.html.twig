@@ -4,3 +4,37 @@
         <h1 class="title">我的地址</h1>
     </header>
 {% endblock %}
+
+
+{% block body %}
+    <div class="content">
+        <div class="list-block media-list">
+            <ul>
+                {% for address in addresses %}
+                <li>
+                    <a href="#" class="item-link item-content">
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">收件人：</div>
+                                <div class="item-after">{{ address.addressee }}</div>
+                            </div>
+                            <div class="item-subtitle">电话：{{ address.phone }}</div>
+                            <div class="item-text">{{ address.fullAddress }}</div>
+                        </div>
+                    </a>
+                </li>
+                {% endfor %}
+                <li>
+                    <a href="{{ path('address_add') }}" class="item-link item-content">
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">添加地址</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+{% endblock %}

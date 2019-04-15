@@ -87,6 +87,7 @@ class WeChat implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
      */
     private $password;
 
@@ -94,6 +95,11 @@ class WeChat implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $salt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $plainPassword;
 
     public function getId(): ?int
     {
@@ -322,7 +328,7 @@ class WeChat implements UserInterface
      */
     public function eraseCredentials()
     {
-        $this->password = null;
+        $this->plainPassword = null;
     }
 
     public function setRoles(?array $roles): self
@@ -349,8 +355,72 @@ class WeChat implements UserInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->password,
+            $this->salt,
+            $this->openid,
+            $this->nickName,
+            $this->headImg,
+            $this->id,
+            $this->subscribe,
+            $this->subscribeTime,
+            $this->country,
+            $this->city,
+            $this->qrcode
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+
+        if (13 === count($data)) {
+            // Unserializing a User object from 1.3.x
+            unset($data[4], $data[5], $data[6], $data[9], $data[10]);
+            $data = array_values($data);
+        } elseif (11 === count($data)) {
+            // Unserializing a User from a dev version somewhere between 2.0-alpha3 and 2.0-beta1
+            unset($data[4], $data[7], $data[8]);
+            $data = array_values($data);
+        }
+
+        list(
+            $this->password,
+            $this->salt,
+            $this->openid,
+            $this->nickName,
+            $this->headImg,
+            $this->id,
+            $this->subscribe,
+            $this->subscribeTime,
+            $this->country,
+            $this->city,
+            $this->qrcode
+            ) = $data;
+    }
+
     public function __toString()
     {
         return "WeChat";
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
     }
 }

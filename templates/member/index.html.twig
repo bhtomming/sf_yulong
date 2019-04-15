@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% set member = app.user.user %}
+{% set wechat = app.user %}
 {% block header %}
     <header class="bar bar-nav">
         <h1 class="title">会员中心</h1>
@@ -15,12 +17,12 @@
                         <ul>
                             <li class="item-content">
                                 <div class="item-media">
-                                    <img src="http://www.bhyulong.cn/themes/tianxin100/images/photo.png" width="72">
+                                    <img src="{{ wechat.headImg }}" width="72" class="headImg">
                                 </div>
                                 <div class="item-inner">
-                                    <div class="item-subtitle color-while">会员ID</div>
-                                    <div class="item-subtitle">微信昵称</div>
-                                    <div class="item-subtitle">关注时间</div>
+                                    <div class="item-subtitle color-while">会员ID: {{ member.username }}</div>
+                                    <div class="item-subtitle">微信昵称: {{ wechat.nickname }}</div>
+                                    <div class="item-subtitle">关注时间: {{ wechat.subscribeTime|date("Y-m-d") }}</div>
                                 </div>
                             </li>
                         </ul>
@@ -38,82 +40,105 @@
         </div>
         <div class="member-content">
             <div class="tabs">
+
+                <div class="account content-inner tab active" id="tab-index">
+                    <div class="list-block">
+                        <ul>
+                            <li>
+                                <a href="{{ path("sale_center")}}"  class="item-link item-content"  >
+                                    <div class="item-inner">
+                                        <div class="item-title">分销中心</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path("member_edit",{ 'id' : app.user.id}) }}" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">用户信息</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path("order_list") }}" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">我的订单</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path("address_list") }}" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">收货地址</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path("reply_list") }}" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">我的留言</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path("assess_list") }}" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">我的评论</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path("logout") }}" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">退出登录</div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div id="tab1" class="tab">
                     <div class="content-block">
                         我的订单
+                        <a href="#tab-index"  class="tab-link item-link item-content"  >
+                            <div class="item-inner">
+                                <div class="item-title">返回会员中心</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div id="tab2" class="tab">
                     <div class="content-block">
                         <p>按人气排序</p>
+                        <a href="#tab-index"  class="tab-link item-link item-content"  >
+                            <div class="item-inner">
+                                <div class="item-title">返回会员中心</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div id="tab3" class="tab">
                     <div class="content-block">
                         <p>按销量排序</p>
+                        <a href="#tab-index"  class="tab-link item-link item-content"  >
+                            <div class="item-inner">
+                                <div class="item-title">返回会员中心</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div id="tab4" class="tab">
                     <div class="content-block">
                         <p>按价格排序</p>
+                        <a href="#tab-index"  class="tab-link item-link item-content"  >
+                            <div class="item-inner">
+                                <div class="item-title">返回会员中心</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="account content-inner">
-            <div class="list-block">
-                <ul>
-                    <li>
-                        <a href="{{ path("sale_center")}}"  class="item-link item-content"  >
-                            <div class="item-inner">
-                                <div class="item-title">分销中心</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path("member_edit",{ 'id' : app.user.id}) }}" class="item-link item-content">
-                            <div class="item-inner">
-                                <div class="item-title">用户信息</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path("order_list") }}" class="item-link item-content">
-                            <div class="item-inner">
-                                <div class="item-title">我的订单</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path("address_list") }}" class="item-link item-content">
-                            <div class="item-inner">
-                                <div class="item-title">收货地址</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path("reply_list") }}" class="item-link item-content">
-                            <div class="item-inner">
-                                <div class="item-title">我的留言</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path("assess_list") }}" class="item-link item-content">
-                            <div class="item-inner">
-                                <div class="item-title">我的评论</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path("logout") }}" class="item-link item-content">
-                            <div class="item-inner">
-                                <div class="item-title">退出登录</div>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+
     </div>
 {% endblock %}

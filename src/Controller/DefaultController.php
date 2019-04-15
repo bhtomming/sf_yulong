@@ -292,12 +292,20 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/logistics", name="logistics")
-     * 微信服务监听页面
+     * 快递查询页面
      */
     public function logistics()
     {
         $logistics = new Logistics();
         $info = $logistics->query('73111467572929','ickd');
+        /*
+         * $info["ickd"] 根数组
+         * $info["ickd"]["status"]快递状态
+         * $info["ickd"]["result"]返回查询的结果
+         * $info["ickd"]["result"]["data"]结果的具体数据，每条数据是一个二维数组，每个数组包含time,description两个元数据
+         * $info["ickd"]["result"]["logistics_company"] 快递公司名称
+         * $info["ickd"]["result"]["logistics_bill_no"] 快递单号
+         */
         dump($info);
         exit;
     }

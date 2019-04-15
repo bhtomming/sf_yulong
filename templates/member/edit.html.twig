@@ -1,4 +1,8 @@
 {% extends 'base.html.twig' %}
+
+{% set member = app.user.user %}
+{% set wechat = app.user %}
+
 {% block header %}
     <header class="bar bar-nav">
         <h1 class="title">我的信息</h1>
@@ -7,21 +11,54 @@
 
 {% block body %}
     <div class="content">
-        <form method="post">
-            <h1 class="h3 mb-3 font-weight-normal">修改信息</h1>
-            <label for="inputUsername" class="sr-only">用户名</label>
-            <input type="text" value="" name="username" id="username" class="form-control" placeholder="用户名" required autofocus>
-            <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="密码" required>
+        <div class="list-block">
+            <ul>
+                <!-- Text inputs -->
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">用户名</div>
+                            <div class="item-input">
+                                <input type="text" placeholder="{{ member.username }}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-password"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">密码</div>
+                            <div class="item-input">
+                                <input type="password" placeholder="******" class="">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <!-- Date -->
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-calendar"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">生日</div>
+                            <div class="item-input">
+                                <input type="date" placeholder="Birth day" value="2014-04-30">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <input type="hidden" name="_csrf_token"
+                       value="{{ csrf_token('_token') }}"
+                >
+            </ul>
 
-            <input type="hidden" name="_csrf_token"
-                   value="{{ csrf_token('_token') }}"
-            >
-
-
-            <button class="btn btn-lg btn-primary" type="submit">
-                确定修改
-            </button>
-        </form>
+            <div class="content-block">
+                <div class="row">
+                    <div class="col-50"><a href="{{ path("member_center") }}" class="button button-big button-fill button-danger">返回</a></div>
+                    <div class="col-50"><a href="#" class="button button-big button-fill button-success">提交</a></div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

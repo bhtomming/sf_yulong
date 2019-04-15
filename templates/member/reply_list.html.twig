@@ -1,12 +1,39 @@
 {% extends 'base.html.twig' %}
 {% block header %}
     <header class="bar bar-nav">
-        <h1 class="title">提现中心</h1>
+        <h1 class="title">我的留言</h1>
     </header>
 {% endblock %}
 
 {% block body %}
 <div class="content">
+    <div class="list-block media-list">
+        <ul>
+            {% for reply in replies %}
+                <li>
+                    <a href="#" class="item-link item-content">
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">留言时间：</div>
+                                <div class="item-after">{{ reply.createTime }}</div>
+                            </div>
+                            <div class="item-text">留言内容:{{ reply.content }}</div>
+                        </div>
+                    </a>
+                </li>
+                {% else %}
+                    <li>
+                        <a href="{{ path('member_center') }}" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title">还没有留言信息</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+            {% endfor %}
 
+        </ul>
+    </div>
 </div>
-{% endblcok %}
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+{% block header %}
+    <header class="bar bar-nav">
+        <h1 class="title">添加地址</h1>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="list-block">
+        {{ form_start(form) }}
+        <ul>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title label">{{ form_label(form.fullAddress) }}</div>
+                        <div class="item-input">
+                            {{ form_widget(form.fullAddress,{'id': 'city-picker'}) }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-password"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title label">{{ form_label(form.zipCode) }}</div>
+                        <div class="item-input">
+                            {{ form_widget(form.zipCode) }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <!-- Date -->
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-calendar"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title label">{{ form_label(form.addressee) }}</div>
+                        <div class="item-input">
+                            {{ form_widget(form.addressee,{'value': member.realName}) }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-calendar"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title label">{{ form_label(form.phone) }}</div>
+                        <div class="item-input">
+                            {{ form_widget(form.phone,{'value': member.phone}) }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('_token') }}"
+            >
+        </ul>
+        <div class="content-block">
+            <div class="row">
+                <div class="col-50"><a href="{{ path("member_center") }}" class="button button-big button-fill button-danger">返回</a></div>
+                <div class="col-50"><button type="submit" class="button button-big button-fill button-success">提交</button></div>
+            </div>
+        </div>
+{{ form_end(form) }}
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="//g.alicdn.com/msui/sm/0.6.2/js/sm-city-picker.min.js" charset="utf-8"></script>
+    <script>
+        $("#city-picker").cityPicker({
+            toolbarTemplate: '<header class="bar bar-nav">\
+            <button class="button button-link pull-right close-picker">确定</button>\
+               <h1 class="title">选择收货地址</h1>\
+             </header>'
+        });
+    </script>
+{% endblock %}

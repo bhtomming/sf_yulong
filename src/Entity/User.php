@@ -201,11 +201,16 @@ final class User implements UserInterface
         return $this->wechat;
     }
 
+
     public function setWechat(?WeChat $wechat): self
     {
         $this->wechat = $wechat;
 
         return $this;
     }
+
+
+
+
 
 }

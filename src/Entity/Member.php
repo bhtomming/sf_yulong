@@ -46,10 +46,7 @@ class Member
      */
     private $nativePlace;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $address;
+
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -126,6 +123,11 @@ class Member
      */
     private $refererImg;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Address", mappedBy="member", cascade={"persist", "remove"})
+     */
+    private $address;
+
 
 
     public function __construct()
@@ -140,6 +142,7 @@ class Member
         $this->replies = new ArrayCollection();
         $this->pointsLog = new ArrayCollection();
         $this->carts = new ArrayCollection();
+        $this->address = new ArrayCollection();
     }
 
     public function hasParent()
@@ -232,17 +235,6 @@ class Member
         return $this;
     }
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(?string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
 
     public function getPhone(): ?string
     {
@@ -621,6 +613,40 @@ class Member
     public function setRefererImg(?string $refererImg): self
     {
         $this->refererImg = $refererImg;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Address[]
+     */
+    public function getAddress(): Collection
+    {
+        if($this->address == null){
+            $this->address = new ArrayCollection();
+        }
+        return $this->address;
+    }
+
+    public function addAddress(Address $address): self
+    {
+        if (!$this->address->contains($address)) {
+            $this->address[] = $address;
+            $address->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddress(Address $address): self
+    {
+        if ($this->address->contains($address)) {
+            $this->address->removeElement($address);
+            // set the owning side to null (unless already changed)
+            if ($address->getMember() === $this) {
+                $address->setMember(null);
+            }
+        }
 
         return $this;
     }

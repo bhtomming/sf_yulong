@@ -55,7 +55,7 @@ class WechatAuthenticator extends AbstractFormLoginAuthenticator
         }
         $credentials = [
             'openid' => $openid,
-            'password' => $request->request->get('password'),
+            //'password' => $request->request->get('password'),
             'csrf_token' => $this->csrfTokenManager->refreshToken('_csrf_token'),
             //'csrf_token' => $request->request->get('_csrf_token'),
            // 'wechat' => $request->request->get('openid') != null,

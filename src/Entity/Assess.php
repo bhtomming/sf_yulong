@@ -16,10 +16,6 @@ class Assess
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $mbId;
 
     /**
      * @ORM\Column(type="integer")
@@ -51,17 +47,6 @@ class Assess
         return $this->id;
     }
 
-    public function getMbId(): ?int
-    {
-        return $this->mbId;
-    }
-
-    public function setMbId(int $mbId): self
-    {
-        $this->mbId = $mbId;
-
-        return $this;
-    }
 
     public function getGoodsId(): ?int
     {

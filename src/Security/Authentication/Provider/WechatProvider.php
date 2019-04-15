@@ -47,7 +47,6 @@ class WechatProvider implements AuthenticationProviderInterface
         if (!$user) {
             throw new UsernameNotFoundException();
         }
-echo "2";
         $token->setUser($user);
 
         return $token;
