@@ -651,5 +651,43 @@ class Member
         return $this;
     }
 
+    /**
+     * 获取直接会员数量
+     */
+    public function getMemberCount()
+    {
+        return count($this->members);
+    }
+
+    /**
+     * 获取间接会员数量
+     */
+    public function getIndirectMemberCount()
+    {
+        $count = 0;
+        if(!empty($this->members)){
+            foreach ($this->members as $member){
+                $count += $member->getMemberCount();
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * 获取第三层会员数量
+     */
+    public function getThirdMemberCount()
+    {
+        $count = 0;
+        if(!empty($this->members)){
+            foreach ($this->members as $member){
+                if(!empty($member->getMembers())){
+                    $count += $member->getIndirectMemberCount();
+                }
+            }
+        }
+        return $count;
+    }
+
 
 }

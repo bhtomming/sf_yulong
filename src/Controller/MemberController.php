@@ -182,6 +182,15 @@ class MemberController extends AbstractController
         return $this->render("member/assess_list.html.twig",['assesses'=>$assesses]);
     }
 
+    /**
+     * @Route("/rank/list", name="rank_list")
+     * 会员积分排行列表
+     */
+    public function rankList()
+    {
+        return $this->render("member/ranking_list.html.twig");
+    }
+
     public function getWechat(): ? WeChat
     {
         return $this->getUser();

@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% set wechat = app.user %}
+{% set user = wechat.user %}
+{% set member = user.member %}
+{% block header %}
+    <header class="bar bar-nav">
+        <a href="{{ path("sale_center") }}" class="icon icon-left pull-left"></a>
+        <h1 class="title">会员积分排行</h1>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <p>--您目前消费积分0，全国排名第0位--</p>
+        <div class="content-padded">
+            <div class="row">
+                <div class="col-33">排名</div>
+                <div class="col-33">用户名</div>
+                <div class="col-33">当前积分</div>
+            </div>
+
+            <div class="row">
+                <div class="col-33">1</div>
+                <div class="col-33">烽行天下</div>
+                <div class="col-33">90</div>
+            </div>
+            <div class="row">
+                <div class="col-33">排名</div>
+                <div class="col-33">用户名</div>
+                <div class="col-33">当前积分</div>
+            </div>
+            <div class="row">
+                <div class="col-33">排名</div>
+                <div class="col-33">用户名</div>
+                <div class="col-33">当前积分</div>
+            </div>
+            <div class="row">
+                <div class="col-33">排名</div>
+                <div class="col-33">用户名</div>
+                <div class="col-33">当前积分</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

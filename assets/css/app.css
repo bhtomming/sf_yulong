@@ -132,3 +132,7 @@ div.member-tabs .tab-link.button.active{
     z-index: 10;
     width: 100%;
 }
+
+.item-panel{
+    display: none;
+}

@@ -1,13 +1,11 @@
 {% extends 'base.html.twig' %}
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="//g.alicdn.com/sui/sui3/0.0.18/css/sui.min.css">
-{% endblock %}
+
 {% set wechat = app.user %}
 {% set user = wechat.user %}
 {% set member = user.member %}
 {% block header %}
     <header class="bar bar-nav">
+        <a href="{{ path("member_center") }}" class="icon icon-left pull-left"></a>
         <h1 class="title">分销中心</h1>
     </header>
 {% endblock %}
@@ -21,7 +19,7 @@
                         <ul>
                             <li class="item-content">
                                 <div class="item-media">
-                                    <img src="http://www.bhyulong.cn/themes/tianxin100/images/photo.png" width="72">
+                                    <img src="{{ wechat.headImg }}" width="72" class="headImg">
                                 </div>
                                 <div class="item-inner">
                                     <div class="item-subtitle color-while">微信昵称：{{ wechat.nickname }}</div>
@@ -40,39 +38,102 @@
             <div class="list-block">
                 <ul>
                     <li>
-                        <div class="item-link item-content">
+                        <div class="item-link item-content" data="panel-1">
                             <div class="item-inner">
                                 <div class="item-title">分销中心</div>
                             </div>
                         </div>
+                        <div class="item-panel list-block" id="panel-1">
+                            <ul>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">分销流程介绍</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <a href="{{ path('member_sale_link') }}" class="item-inner">
+                                        <div class="item-title">获取推广二维码</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
+
                     <li>
-                        <div class="item-link item-content">
+                        <div class="item-link item-content" data="panel-2">
                             <div class="item-inner">
                                 <div class="item-title">我的盟友</div>
                             </div>
                         </div>
+                        <div class="item-panel list-block" id="panel-2">
+                            <ul>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">一级会员{{ member.memberCount }}人</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">二级会员{{ member.indirectMemberCount }}人</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">三级会员{{ member.thirdMemberCount }}人</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                     <li>
-                        <div class="item-link item-content">
+                        <div class="item-link item-content" data="panel-3">
                             <div class="item-inner">
                                 <div class="item-title">我的积分</div>
                             </div>
                         </div>
+                        <div class="item-panel" id="panel-3">
+                            <ul>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">自己订单积分</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">直接下线订单积分</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">间接下线订单积分</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">了解积分</div>
+                                    </div>
+                                </li>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">积分兑换礼品</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                     <li>
-                        <div class="item-link item-content">
+                        <a href="{{ path('member_cash') }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">申请提现</div>
                             </div>
-                        </div>
+                        </a>
                     </li>
                     <li>
-                        <div class="item-link item-content">
+                        <a href="{{ path("rank_list") }}" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title">会员积分排行榜</div>
                             </div>
-                        </div>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -83,66 +144,15 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $.fn.slideDown = function (speed, callback) {
-            //获取元素position
-            var position = this.css('position');
-            this.show().css({
-                position: 'absolute',
-                visibility: 'hidden'
-            });
-            $('html,body').css({
-                overflow: 'hidden',
-                height: '100%'
-            });
-            //获取元素高度
-            var height = this.height() === 0 ? $(window).height() : this.height();
+        $(".item-link").on('click',function(){
+            var id = $(this).attr('data');
+            var panel = $("#"+id);
+            if(panel.css('display') == 'none'){
+                panel.show();
+            }else{
+                panel.hide();
+            }
+        });
 
-            //-------通过伸缩元素高度实现动画-------
-            //return this.css({
-            //    position: position,
-            //    visibility: 'visible',
-            //    overflow: 'auto',
-            //    height: 0
-            //}).animate({ height: height, top: $(window).scrollTop() }, speed, null, callback);
-
-            //-------通过移动元素相对位置实现动画-------
-            return this.css({
-                top: -height,
-                left: 0,
-                position: position,
-                visibility: 'visible',
-                overflow: 'auto'
-            }).animate({ top: $(window).scrollTop() }, speed, null, callback);
-        };
-
-        $.fn.slideUp = function (speed, callback) {
-            //获取元素position
-            var position = this.css('position');
-            this.show().css({
-                position: 'absolute',
-                visibility: 'auto'
-            });
-            $('html,body').css({
-                overflow: '',
-                height: ''
-            });
-            //获取元素高度
-            var height = this.height();
-            //-------通过伸缩元素高度实现动画-------
-            //return this.css({
-            //    position: position,
-            //    visibility: 'visible',
-            //    overflow: 'hidden',
-            //    height: height
-            //}).animate({ height: 0 }, speed, null, callback);
-
-            //-------通过移动元素相对位置实现动画-------
-            return this.css({
-                left: 0,
-                position: position,
-                visibility: 'visible',
-                overflow: 'auto'
-            }).animate({ top: -height }, speed, null, callback);
-        };
     </script>
 {% endblock %}
