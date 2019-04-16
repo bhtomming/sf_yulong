@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -50,20 +52,22 @@ final class User implements UserInterface
      */
     private $checkRefundLog;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Cash", inversedBy="checker", cascade={"persist", "remove"})
-     */
-    private $checkCashLog;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\WeChat", inversedBy="user", cascade={"persist", "remove"})
      */
     private $wechat;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Cash", mappedBy="checker")
+     */
+    private $checkCashLog;
+
 
 
     public function __construct()
     {
+        $this->checkCashLog = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,17 +188,7 @@ final class User implements UserInterface
         return $this;
     }
 
-    public function getCheckCashLog(): ?Cash
-    {
-        return $this->checkCashLog;
-    }
 
-    public function setCheckCashLog(?Cash $checkCashLog): self
-    {
-        $this->checkCashLog = $checkCashLog;
-
-        return $this;
-    }
 
     public function getWechat(): ?WeChat
     {
@@ -205,6 +199,37 @@ final class User implements UserInterface
     public function setWechat(?WeChat $wechat): self
     {
         $this->wechat = $wechat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Cash[]
+     */
+    public function getCheckCaseLog(): Collection
+    {
+        return $this->checkCashLog;
+    }
+
+    public function addCheckCashLog(Cash $checkCashLog): self
+    {
+        if (!$this->checkCashLog->contains($checkCashLog)) {
+            $this->checkCaseLog[] = $checkCashLog;
+            $checkCashLog->setChecker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCheckCashLog(Cash $checkCashLog): self
+    {
+        if ($this->checkCashLog->contains($checkCashLog)) {
+            $this->checkCashLog->removeElement($checkCashLog);
+            // set the owning side to null (unless already changed)
+            if ($checkCashLog->getChecker() === $this) {
+                $checkCashLog->setChecker(null);
+            }
+        }
 
         return $this;
     }

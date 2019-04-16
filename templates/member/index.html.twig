@@ -121,7 +121,7 @@
                 </div>
                 <div id="tab3" class="tab">
                     <div class="content-block">
-                        <p>按销量排序</p>
+                        {{ include('member/amount_log.html.twig',{'amountLog': member.pointsLog}) }}
                         <a href="#tab-index"  class="tab-link item-link item-content"  >
                             <div class="item-inner">
                                 <div class="item-title">返回会员中心</div>
@@ -131,7 +131,7 @@
                 </div>
                 <div id="tab4" class="tab">
                     <div class="content-block">
-                        <p>按价格排序</p>
+                        <p>您还没有红包</p>
                         <a href="#tab-index"  class="tab-link item-link item-content"  >
                             <div class="item-inner">
                                 <div class="item-title">返回会员中心</div>

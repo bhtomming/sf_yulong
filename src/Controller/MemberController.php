@@ -11,12 +11,15 @@ namespace App\Controller;
 
 
 use App\Entity\Address;
+use App\Entity\Cash;
 use App\Entity\Exchange;
 use App\Entity\Member;
+use App\Entity\PointsLog;
 use App\Entity\User;
 use App\Entity\WeChat;
 use App\Entity\WechatConfig;
 use App\Form\AddressForm;
+use App\Form\CashForm;
 use App\Form\ExchangeForm;
 use App\Servers\WeChatServer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -95,9 +98,31 @@ class MemberController extends AbstractController
      * @Route("/cash", name="member_cash")
      * 提现页面
      */
-    public function cash()
+    public function cash(Request $request)
     {
-        return $this->render("member/cash.html.twig");
+        $cash = new Cash();
+        $member = $this->getMember();
+        $form = $this->createForm(CashForm::class,$cash);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $cash = $form->getData();
+            $member->addCashLog($cash);
+            $amount = $cash->getAmount();
+            if($amount > $member->getAmount()){
+                $this->addFlash('error',"余额不足，请重新输入");
+            }
+            $member->addAmount('-'.$amount);
+            $amountLog = new PointsLog();
+            $amountLog->setChangeReason('提现到微信')
+                ->setAmount('-'.$amount)
+                ->setLogType(PointsLog::CASH);
+            $member->addPointsLog($amountLog);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($member);
+            $em->flush();
+        }
+        return $this->render("member/cash.html.twig",['form' => $form->createView()]);
     }
 
     /**

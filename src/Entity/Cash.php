@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Cash
 {
+    const UNCHECK = 0;
+    const CHECKED = 1;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -51,9 +54,17 @@ class Cash
     private $member;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="checkCashLog", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="checkCaseLog")
      */
     private $checker;
+
+
+
+    public function __construct()
+    {
+        $this->createdTime = new \DateTime('now');
+        $this->status = self::UNCHECK;
+    }
 
     public function getId(): ?int
     {
@@ -140,16 +151,12 @@ class Cash
         return $this->checker;
     }
 
-    public function setChecker(?User $user): self
+    public function setChecker(?User $checker): self
     {
-        $this->checker = $user;
-
-        // set (or unset) the owning side of the relation if necessary
-        $newCheckCashLog = $user === null ? null : $this;
-        if ($newCheckCashLog !== $user->getCheckCashLog()) {
-            $user->setCheckCashLog($newCheckCashLog);
-        }
+        $this->checker = $checker;
 
         return $this;
     }
+
+
 }

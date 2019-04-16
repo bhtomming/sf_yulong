@@ -7,7 +7,17 @@
 {% endblock %}
 
 {% block body %}
-<div class="content">
+    <div class="content">
+        {{ form_start(form) }}
+        {{ form_label(form.amount) }}
+        {{ form_widget(form.amount) }}
+        <input type="hidden" name="_csrf_token"
+               value="{{ csrf_token('authenticate') }}"
+        >
+        <button class="btn btn-lg btn-primary" type="submit">
+            马上提现
+        </button>
+        {{ form_end(form) }}
 
-</div>
+    </div>
 {% endblock %}

@@ -84,7 +84,7 @@ class Member
     private $exchangeLog;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Cash", mappedBy="member")
+     * @ORM\OneToMany(targetEntity="App\Entity\Cash", mappedBy="member", cascade={"persist", "remove"})
      */
     private $cashLog;
 
@@ -109,7 +109,7 @@ class Member
     private $replies;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PointsLog", mappedBy="member")
+     * @ORM\OneToMany(targetEntity="App\Entity\PointsLog", mappedBy="member", cascade={"persist", "remove"})
      */
     private $pointsLog;
 
