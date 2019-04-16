@@ -1,0 +1,16 @@
+<div class="content-padded">
+    <div class="row">
+        <div class="col-33">时间</div>
+        <div class="col-33">备注</div>
+        <div class="col-33">数量</div>
+    </div>
+    {% for log in pointsLog %}
+        {% if log.logType != 1 and log.Type != 2 %}
+        <div class="row">
+            <div class="col-33">{{ log.createTime | date('Y-m-d H:i:s') }}</div>
+            <div class="col-33">{{ log.changeReason }}</div>
+            <div class="col-33">{{ log.points }}</div>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>

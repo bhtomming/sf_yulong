@@ -317,7 +317,7 @@ class Member
         return $this->trades;
     }
 
-    public function addTrade(Trade $trade): self
+    public function addTrades(Trade $trade): self
     {
         if (!$this->trades->contains($trade)) {
             $this->trades[] = $trade;
@@ -327,7 +327,7 @@ class Member
         return $this;
     }
 
-    public function removeTrade(Trade $trade): self
+    public function removeTrades(Trade $trade): self
     {
         if ($this->trades->contains($trade)) {
             $this->trades->removeElement($trade);
@@ -687,6 +687,24 @@ class Member
             }
         }
         return $count;
+    }
+
+
+    /**
+     * 获取消费累计积分
+     */
+    public function getPayPoint($reason)
+    {
+        $point = 0;
+        $pointLogs = $this->getPointsLog();
+        if(!empty($pointLogs)){
+            foreach ($pointLogs as $pointLog){
+                if($pointLog->getChangeReason() == $reason){
+                    $point += $pointLog->getPoints();
+                }
+            }
+        }
+        return $point;
     }
 
 

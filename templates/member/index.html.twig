@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% set member = app.user.user %}
+{% set user = app.user.user %}
 {% set wechat = app.user %}
+{% set member = user.member %}
 {% block header %}
     <header class="bar bar-nav">
         <a href="{{ path("home_page") }}" class="icon icon-left pull-left"></a>
@@ -21,7 +22,7 @@
                                     <img src="{{ wechat.headImg }}" width="72" class="headImg">
                                 </div>
                                 <div class="item-inner">
-                                    <div class="item-subtitle color-while">会员ID: {{ member.username }}</div>
+                                    <div class="item-subtitle color-while">会员ID: {{ user.username }}</div>
                                     <div class="item-subtitle">微信昵称: {{ wechat.nickname }}</div>
                                     <div class="item-subtitle">关注时间: {{ wechat.subscribeTime|date("Y-m-d") }}</div>
                                 </div>
@@ -100,8 +101,8 @@
 
                 <div id="tab1" class="tab">
                     <div class="content-block">
-                        我的订单
-                        <a href="#tab-index"  class="tab-link item-link item-content"  >
+                        {{ include('member/order_item.html.twig',{'order': member.trades}) }}
+                        <a href="#tab-index"  class="tab-link item-content"  >
                             <div class="item-inner">
                                 <div class="item-title">返回会员中心</div>
                             </div>
@@ -110,7 +111,7 @@
                 </div>
                 <div id="tab2" class="tab">
                     <div class="content-block">
-                        <p>按人气排序</p>
+                        {{ include('member/points_log.html.twig',{'pointsLog': member.pointsLog}) }}
                         <a href="#tab-index"  class="tab-link item-link item-content"  >
                             <div class="item-inner">
                                 <div class="item-title">返回会员中心</div>

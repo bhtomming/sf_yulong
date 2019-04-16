@@ -11,9 +11,13 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Trade
 {
-    const UNPAY = 0;
-    const PAIED = 1;
-    const CLOSE = 2;
+    const UNPAY = 0; //未付款
+    const PAIED = 1;  //已付款
+    const CLOSE = 2;  //已关闭
+
+    const UNSEND = 0;
+    const SENDING = 1;
+    const RECIVER = 2;
 
     /**
      * @ORM\Id()
@@ -64,12 +68,23 @@ class Trade
      */
     private $payLog;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createTime;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $logisticsStatus;
+
     public function __construct()
     {
         $this->goodsSnapshot = new ArrayCollection();
         mt_srand((double) microtime() * 1000000);
         $this->tradeNo = "DD".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $this->status = self::UNPAY;
+        $this->logisticsStatus = self::UNSEND;
         $dateTime = new \DateTime('now');
         $dateTime->modify("+30 minute");
         $this->setExamineTime($dateTime);
@@ -205,6 +220,37 @@ class Trade
     public function setPayLog(PayLog $payLog): self
     {
         $this->payLog = $payLog;
+
+        return $this;
+    }
+
+    public function getFirstImage()
+    {
+        $goods = $this->getGoodsSnapshot()->first();
+        assert($goods instanceof GoodsSnapshot);
+        return $goods->getGoodsImg();
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
+    }
+
+    public function setCreateTime(\DateTimeInterface $createTime): self
+    {
+        $this->createTime = $createTime;
+
+        return $this;
+    }
+
+    public function getLogisticsStatus(): ?string
+    {
+        return $this->logisticsStatus;
+    }
+
+    public function setLogisticsStatus(?string $logisticsStatus): self
+    {
+        $this->logisticsStatus = $logisticsStatus;
 
         return $this;
     }

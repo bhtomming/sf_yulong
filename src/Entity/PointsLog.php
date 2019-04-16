@@ -9,6 +9,19 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class PointsLog
 {
+    const CHONGZHI = 1;  //充值
+
+    const CASH = 2; //提现
+
+    const EXCHANGE = 3; //兑换
+
+    const OWNPOINT = 4; //自己消费积分
+
+    const DIRECTPOINT = 5; //下级消费积分
+
+    const INDIRECTPOINT = 6; //间接下级消费积分
+
+    const FAINDIRECTPOINT = 7; //第三代下级消费积分
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -40,6 +53,11 @@ class PointsLog
      * @ORM\ManyToOne(targetEntity="App\Entity\Member", inversedBy="pointsLog")
      */
     private $member;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $logType;
 
     public function __construct()
     {
@@ -110,6 +128,18 @@ class PointsLog
     public function setMember(?Member $member): self
     {
         $this->member = $member;
+
+        return $this;
+    }
+
+    public function getLogType(): ?string
+    {
+        return $this->logType;
+    }
+
+    public function setLogType(?string $logType): self
+    {
+        $this->logType = $logType;
 
         return $this;
     }

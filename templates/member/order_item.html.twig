@@ -1,0 +1,30 @@
+<div class="list-block media-list">
+    <ul>
+        {% for order_item in order %}
+        <li>
+            <a href="#" class="item-link item-content">
+                <div class="item-media"><img src="http://gqianniu.alicdn.com/bao/uploaded/i4//tfscom/i3/TB10LfcHFXXXXXKXpXXXXXXXXXX_!!0-item_pic.jpg_250x250q60.jpg" width="80"></div>
+                <div class="item-inner">
+                    <div class="item-title-row">
+                        <div class="item-title">订单编号{{ order_item.tradeNo }}</div>
+                        <span class="item-after">删除该订单</span>
+                    </div>
+                    <div class="pull-right">{{ order_item.totalAmount }}元</div>
+                    <div class="item-subtitle">订单状态：{{ order_item.status == 1 ? '已付款':'未付款' }}</div>
+                    <div class="item-text">下单时间: {{ order_item.createTime | date('Y-m-d H:i:s') }}</div>
+                </div>
+            </a>
+        </li>
+        {% else %}
+            <li>
+                <a href="#" class="item-link item-content">
+                    <div class="item-inner">
+                        <div class="item-title-row">
+                            <div class="item-title">还没有订单</div>
+                        </div>
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
