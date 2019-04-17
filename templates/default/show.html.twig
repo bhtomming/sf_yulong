@@ -2,9 +2,74 @@
 
 {% block header %}
     <header class="bar bar-nav">
-        <h1 class="title">商品详情</h1>
+        <a href="#">商品</a>
+        <a href="#goods_xq">详情</a>
+        <a href="#">评价</a>
     </header>
 {% endblock %}
 {% block body %}
+<div class="content">
+    <div class="silder"></div>
+    <div class="goods-header">
+        <h3>{{ goods.name }}</h3>
+        <div class="right"><div onClick="tiaozhuan()" id="pro_share" class="share">微信</div></div>
+    </div>
+    <dl class="goods_price">
+        <dt> <span id="ECS_GOODS_AMOUNT">{{ goods.discountPrice }}</span><del>价格：{{ goods.price }}</del>
+            <p>购买此商品赠送{'0'}积分</p>
+        </dt>
+    </dl>
+    <div class="subNavBox">
+        <div class="subNav on"><strong>购买数量</strong></div>
+        <ul class="navContent" style="display: block;">
+            <li style=" border-bottom:1px solid #eeeeee">
+                <div class="item1">
+                    <script language="javascript" type="text/javascript">  function goods_cut(){  var num_val=document.getElementById('number');  var new_num=num_val.value;  var Num = parseInt(new_num);  if(Num>1)Num=Num-1;  num_val.value=Num;  }  function goods_add(){  var num_val=document.getElementById('number');  var new_num=num_val.value;  var Num = parseInt(new_num);  Num=Num+1;  num_val.value=Num;  } </script>
+                    <span class="ui-number">
+                    <button type="button" class="decrease" onclick="goods_cut();changePrice();">-</button>
+                    <input type="text" class="num" id="number" onblur="changePrice();" name="number" value="1" min="1" max="{$goods.goods_number}"/>
+                    <button type="button" class="increase" onclick="goods_add();changePrice();">+</button>
+                    </span>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="subNavBox" >
+        <div class="subNav"><strong>会员专享价</strong>{{ goods.discountPrice }}元</div>
+    </div>
+    <div class="main" id="user_goods_ka_2" >
+        <section class="index_floor">
+            <h2 style=" border-bottom:1px solid #ddd ; margin-top:40px;" name="goods_xq">
+                <span></span>详细信息
+            </h2>
+            <p>{{ goods.description|raw }}</p>
+        </section>
+    </div>
+</div>
 
+{% endblock %}
+
+{% block navigation %}
+    <nav class="bar bar-tab">
+        <a class="tab-item external active" href="{{ path("home_page") }}">
+            <span class="icon icon-home"></span>
+            <span class="tab-label">首页</span>
+        </a>
+        <a class="tab-item external" href="{{ path("hot_sale") }}">
+            <span class="icon icon-app"></span>
+            <span class="tab-label">客服</span>
+        </a>
+        <a class="tab-item external" href="{{ path("member_sale_link") }}">
+            <span class="icon icon-share"></span>
+            <span class="tab-label">收藏</span>
+        </a>
+        <a class="tab-item external" href="{{ path("member_center") }}">
+            <span class="icon icon-me"></span>
+            <span class="tab-label">加入购物车</span>
+        </a>
+        <a class="tab-item external" href="javascript:ttkefuyaoqing.startchats()" external>
+            <span class="icon icon-emoji"></span>
+            <span class="tab-label">立即购买</span>
+        </a>
+    </nav>
 {% endblock %}

@@ -31,8 +31,6 @@ class Goods
      */
     private $summary;
 
-
-
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -70,6 +68,7 @@ class Goods
 
     /**
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     * 优惠价
      */
     private $discountPrice;
 

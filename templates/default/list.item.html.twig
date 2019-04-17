@@ -1,5 +1,6 @@
 <div class="col-50 index-goods-list">
     <div class="card demo-card-header-pic">
+        <a href="{{ path('goods_show',{ 'id': goods.id }) }}">
         <div valign="bottom" class="card-header color-white no-border no-padding">
             <img class='card-cover' src="http://bhyulong.cn/images/201901/thumb_img/48_thumb_G_1546921626593.jpg" alt="">
         </div>
@@ -9,5 +10,6 @@
                 <p>{{ goods.price }}<span class="pull-right">购物车</span></p>
             </div>
         </div>
+        </a>
     </div>
 </div>
