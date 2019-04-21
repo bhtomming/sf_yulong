@@ -14,13 +14,18 @@ namespace App\Admin;
 
 use App\Entity\Category;
 use App\Entity\Goods;
+use App\Entity\GoodsImage;
+use App\Form\Type\GoodsImageType;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 final class GoodsAdmin extends AbstractAdmin
 {
@@ -36,6 +41,14 @@ final class GoodsAdmin extends AbstractAdmin
         $form->add('name',null,['label'=>'商品名称'])
             ->add('price',null,['label'=>'价格'])
             ->add('titleImg',null,['label'=>'标题图片'])
+            ->add('sliderImages',CollectionType::class,[
+                    'label'=>'上传图片',
+                'entry_type' => GoodsImageType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+
+            ])
             //->add('voide',FileType::class,['label'=>'视频'])
             ->add('stock',null,['label'=>'库存'])
             ->add('isFront',null,['label'=>'上首页'])
@@ -50,6 +63,7 @@ final class GoodsAdmin extends AbstractAdmin
                 'class'=>Category::class,
                 'label'=>'分类',
                 'choice_label'=>'name'
+
             ])
             ->add('description',CKEditorType::class,['label'=>'详细描述','config'=>['toolbar'=>'full']])
 
@@ -62,16 +76,23 @@ final class GoodsAdmin extends AbstractAdmin
         ;
     }
 
-    public function preCreate($goods)
+    public function prePersist($goods)
     {
-        if(! $goods instanceof Goods){
-            return null;
-        }
+        assert($goods instanceof Goods);
+
+
         if($goods->getSaling()){
             $goods->setPublishTime(new \DateTime('now'));
         }
 
         return $goods;
+    }
+
+    public function preUpdate($goods)
+    {
+        assert($goods instanceof Goods);
+
+
     }
 
 

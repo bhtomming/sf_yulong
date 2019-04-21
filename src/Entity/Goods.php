@@ -2,10 +2,16 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Form\Type\VichImageType;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GoodsRepository")
+ *  @Vich\Uploadable
  */
 class Goods
 {
@@ -36,10 +42,6 @@ class Goods
      */
     private $titleImg;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $swiperImg;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -121,11 +123,22 @@ class Goods
      * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="goods")
      */
     private $category;
+    
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updated;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\GoodsImage", mappedBy="goods",cascade={"persist", "remove"})
+     */
+    private $sliderImages;
 
     public function __construct()
     {
         $this->setCreatedTime(new \DateTime('now'));
         $this->setSale(0);
+        $this->sliderImages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,17 +195,6 @@ class Goods
         return $this;
     }
 
-    public function getSwiperImg(): ?string
-    {
-        return $this->swiperImg;
-    }
-
-    public function setSwiperImg(?string $swiperImg): self
-    {
-        $this->swiperImg = $swiperImg;
-
-        return $this;
-    }
 
     public function getVoide(): ?string
     {
@@ -389,5 +391,50 @@ class Goods
     public function getUrl()
     {
         return "http://weixin.drupai.com/goods/".$this->id;
+    }
+
+
+    public function getUpdated(): ?\DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(?\DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|GoodsImage[]
+     */
+    public function getSliderImages(): Collection
+    {
+        return $this->sliderImages;
+    }
+
+
+    public function addSliderImage(GoodsImage $sliderImage = null): self
+    {
+        if (!$this->sliderImages->contains($sliderImage)) {
+            $this->sliderImages[] = $sliderImage;
+            $sliderImage->setGoods($this);
+
+        }
+        return $this;
+    }
+
+    public function removeSliderImage(GoodsImage $sliderImage): self
+    {
+        if ($this->sliderImages->contains($sliderImage)) {
+            $this->sliderImages->removeElement($sliderImage);
+            // set the owning side to null (unless already changed)
+            if ($sliderImage->getGoods() === $this) {
+                $sliderImage->setGoods(null);
+            }
+        }
+
+        return $this;
     }
 }
