@@ -79,8 +79,6 @@ final class GoodsAdmin extends AbstractAdmin
     public function prePersist($goods)
     {
         assert($goods instanceof Goods);
-
-
         if($goods->getSaling()){
             $goods->setPublishTime(new \DateTime('now'));
         }

@@ -707,5 +707,10 @@ class Member
         return $point;
     }
 
+    public function getMemberName()
+    {
+        return $this->getUser()->getUsername();
+    }
+
 
 }

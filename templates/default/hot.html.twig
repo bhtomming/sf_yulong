@@ -32,34 +32,41 @@
 
         <div class="tabs">
             <div id="tab1" class="tab active">
-                {% for goods in goodes  %}
-                    <div class="content-block">
-                        {{ goods.name }}
+                <div class="content-block">
+                    <div class="row  no-gutter">
+                    {% for goods in goodes  %}
+                        {{ include("default/list.item.html.twig",{"goods" : goods}) }}
+                    {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
             <div id="tab2" class="tab">
                 <div class="content-block">
+                    <div class="row  no-gutter">
                     {% for goods in rgoods  %}
-                        <div class="content-block">
-                            <p>{{ goods.name }}</p>
-                        </div>
+                        {{ include("default/list.item.html.twig",{"goods" : goods}) }}
                     {% endfor %}
+                    </div>
                 </div>
             </div>
             <div id="tab3" class="tab">
-                {% for goods in sgoods  %}
-                    <div class="content-block">
-                        <p>{{ goods.name }}</p>
+                <div class="content-block">
+                    <div class="row  no-gutter">
+                    {% for goods in sgoods  %}
+
+                            {{ include("default/list.item.html.twig",{"goods" : goods}) }}
+                    {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
             <div id="tab4" class="tab">
-                {% for goods in pgoods  %}
-                    <div class="content-block">
-                        <p>{{ goods.name }}</p>
+                <div class="content-block">
+                    <div class="row  no-gutter">
+                    {% for goods in pgoods  %}
+                            {{ include("default/list.item.html.twig",{"goods" : goods}) }}
+                    {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
         </div>
     </div>

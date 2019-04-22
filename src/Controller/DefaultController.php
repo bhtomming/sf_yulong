@@ -179,7 +179,7 @@ class DefaultController extends AbstractController
 
         $em = $this->getDoctrine()->getManager();
         $pointsConfig = $em->getRepository(PointsConfig::class)->find(1);
-        $pointRest = $pointsConfig->getPayPoint() / 100;
+        $pointRest = $pointsConfig->getGivePoint() / 100;
         $points = 0;
         $amount = 0;
         //添加订单商品，形成商品快照
@@ -260,7 +260,7 @@ class DefaultController extends AbstractController
                         echo 'invalidate';
                         return false;
                     }
-                    $points = $trade->getGivePoints();
+                    $points = $trade->getPayPoint();
 
                     $trade->setStatus(Trade::PAIED);
                     $member = $trade->getMember();

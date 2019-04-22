@@ -10,15 +10,32 @@
 namespace App\Twig;
 
 
+use App\Entity\PointsConfig;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function getFilters()
     {
         return [
             new TwigFilter("object_sort",[$this,'objectSort'])
+        ];
+    }
+
+    public function getFunctions()
+    {
+        return [
+            new TwigFunction("give_point",[$this,'givePoint'])
         ];
     }
 
@@ -56,6 +73,17 @@ class AppExtension extends AbstractExtension
 
         }
         return $arr;
+    }
+
+    public function givePoint($price)
+    {
+        $em = $this->container->get('doctrine.orm.entity_manager');
+        $pointsConfig = $em->getRepository(PointsConfig::class)->find(1);
+        $givePoints = 0;
+        if($pointsConfig instanceof PointsConfig){
+            $givePoints = $pointsConfig->getPayPoint() * $price /100;
+        }
+        return $givePoints;
     }
 
 }

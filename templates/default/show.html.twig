@@ -8,15 +8,22 @@
     </header>
 {% endblock %}
 {% block body %}
-<div class="content">
-    <div class="silder"></div>
+<div id="show-container" class="content">
+    <div class="swiper-container" data-space-between="0" data-autoplay="5000">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="{{ asset('build/images/sw1.jpg') }}" width="100%" /> </div>
+            <div class="swiper-slide"><img src="{{ asset('build/images/sw2.jpg') }}" width="100%" /> </div>
+            <div class="swiper-slide"><img src="{{ asset('build/images/sw3.jpg') }}" width="100%" /> </div>
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
     <div class="goods-header">
         <h3>{{ goods.name }}</h3>
         <div class="right"><div onClick="tiaozhuan()" id="pro_share" class="share">微信</div></div>
     </div>
     <dl class="goods_price">
-        <dt> <span id="ECS_GOODS_AMOUNT">{{ goods.discountPrice }}</span><del>价格：{{ goods.price }}</del>
-            <p>购买此商品赠送{'0'}积分</p>
+        <dt> <span id="ECS_GOODS_AMOUNT">{{ goods.discountPrice ? : goods.price }}元</span><del>价格：{{ goods.price }}</del>
+            <p>购买此商品赠送{{ give_point(goods.discountPrice ?: goods.price) }}积分</p>
         </dt>
     </dl>
     <div class="subNavBox">
