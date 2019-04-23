@@ -9,32 +9,51 @@
 {% endblock %}
 {% block body %}
 <div id="show-container" class="content">
-    <div class="swiper-container" data-space-between="0" data-autoplay="5000">
+    <div id="show-swiper" class="swiper-container" data-space-between="0" data-autoplay="5000">
         <div class="swiper-wrapper">
-            <div class="swiper-slide"><img src="{{ asset('build/images/sw1.jpg') }}" width="100%" /> </div>
-            <div class="swiper-slide"><img src="{{ asset('build/images/sw2.jpg') }}" width="100%" /> </div>
-            <div class="swiper-slide"><img src="{{ asset('build/images/sw3.jpg') }}" width="100%" /> </div>
+            {% for swiper in goods.sliderImages %}
+            <div class="swiper-slide"><img src="{{ vich_uploader_asset(swiper,'file') }}" width="100%" /> </div>
+            {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
     </div>
     <div class="goods-header">
         <h3>{{ goods.name }}</h3>
         <div class="right"><div onClick="tiaozhuan()" id="pro_share" class="share">微信</div></div>
+        <div id="share_wx_notice" onclick="tiaozhuan_hide()"><span></span></div>
     </div>
     <dl class="goods_price">
-        <dt> <span id="ECS_GOODS_AMOUNT">{{ goods.discountPrice ? : goods.price }}元</span><del>价格：{{ goods.price }}</del>
+        <dt> <span id="goods-amount">{{ goods.discountPrice ? : goods.price }}元</span><del>价格：{{ goods.price }}</del>
             <p>购买此商品赠送{{ give_point(goods.discountPrice ?: goods.price) }}积分</p>
         </dt>
     </dl>
+    <section id="search_ka" class="huodong">
+        <div class="subNav" data-sub="nav-youhui">
+            <div class="att_title">
+                <span>惠</span>
+                <p>购买4件&nbsp;优惠价：<sub>￥</sub>{{ 4 * (goods.price - goods.discountPrice)}}</p>
+            </div>
+        </div>
+        <div class="navContent nav-youhui" >
+            <ul class="youhui_list1" style="margin-top:0px;">
+                <li><img src="{{ asset('build/images/hui.png') }}" data-bd-imgshare-binded="1">购买4件&nbsp;优惠价：<sub>￥</sub>{{ 4 * (goods.price - goods.discountPrice)}}</li>
+            </ul>
+            <ul class="youhui_list1" style="margin-top:0px;">
+                <li><img src="{{ asset('build/images/hui.png') }}" data-bd-imgshare-binded="1">购买此商品可使用：0 积分</li>
+                <li><img src="{{ asset('build/images/hui.png') }}" data-bd-imgshare-binded="1">购买此商品赠送： {{ give_point(goods.discountPrice ?: goods.price) }}积分</li>
+                <div class="blank10"></div>
+            </ul>
+        </div>
+    </section>
     <div class="subNavBox">
-        <div class="subNav on"><strong>购买数量</strong></div>
-        <ul class="navContent" style="display: block;">
+        <div class="subNav" data-sub="nav-num"><strong>购买数量</strong></div>
+        <ul class="navContent nav-num">
             <li style=" border-bottom:1px solid #eeeeee">
                 <div class="item1">
                     <script language="javascript" type="text/javascript">  function goods_cut(){  var num_val=document.getElementById('number');  var new_num=num_val.value;  var Num = parseInt(new_num);  if(Num>1)Num=Num-1;  num_val.value=Num;  }  function goods_add(){  var num_val=document.getElementById('number');  var new_num=num_val.value;  var Num = parseInt(new_num);  Num=Num+1;  num_val.value=Num;  } </script>
                     <span class="ui-number">
                     <button type="button" class="decrease" onclick="goods_cut();changePrice();">-</button>
-                    <input type="text" class="num" id="number" onblur="changePrice();" name="number" value="1" min="1" max="{$goods.goods_number}"/>
+                    <input type="text" class="num" id="number" onblur="changePrice();" name="number" value="1" min="1" max="{{ goods.stock }}"/>
                     <button type="button" class="increase" onclick="goods_add();changePrice();">+</button>
                     </span>
                 </div>
@@ -42,15 +61,19 @@
         </ul>
     </div>
     <div class="subNavBox" >
-        <div class="subNav"><strong>会员专享价</strong>{{ goods.discountPrice }}元</div>
+        <div class="subNav" data-sub="nav-mbjg"><strong>会员专享价</strong>{{ goods.discountPrice ? : goods.price }}元</div>
     </div>
     <div class="main" id="user_goods_ka_2" >
         <section class="index_floor">
             <h2 style=" border-bottom:1px solid #ddd ; margin-top:40px;" name="goods_xq">
                 <span></span>详细信息
             </h2>
-            <p>{{ goods.description|raw }}</p>
         </section>
+        <div class="product_main">
+            <div class="product_images product_desc" id="product_desc">
+                {{ goods.description|raw }}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -79,4 +102,22 @@
             <span class="tab-label">立即购买</span>
         </a>
     </nav>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.js' charset='utf-8'></script>
+    <script>
+        $(".subNav").click(function(){
+            var sub = $(this).data('sub');
+            if($(this).attr('class').indexOf('on') != -1){
+                $(this).removeClass("on");
+                $("."+sub).hide();
+            }else{
+                $(this).addClass("on");
+                $("."+sub).show();
+            }
+
+        });
+    </script>
 {% endblock %}
