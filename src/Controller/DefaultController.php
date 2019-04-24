@@ -114,6 +114,7 @@ class DefaultController extends AbstractController
 
         $member = $this->getMemberIfLogin();
 
+
         $cart = new Cart();
         if(!$goods->getSaling()){
             $data['msg'] = '该商品已经下架';
@@ -123,6 +124,8 @@ class DefaultController extends AbstractController
             $data['msg'] ='该商品库存不足';
         }
         $data['price'] =$goods->getPrice() * $num;
+        $data['disPrice'] = $goods->getDiscountPrice() * $num;
+
         $cart->setNum($num);
         $member->addCart($cart);
         $em->persist($member);

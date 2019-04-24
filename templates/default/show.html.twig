@@ -101,10 +101,10 @@
         </div>
         <div class="right-button">
             <div class="buttons-row">
-                <a class="button button-round" href="{{ path("add_cart",{'goods_id':goods.id,'num':1}) }}">
+                <a class="button button-round btn-add-cart" href="javascript:addCart();"  >
                     加入购物车
                 </a>
-                <a class="button button-round" href="javascript:ttkefuyaoqing.startchats()" external>
+                <a class="button button-round" href="javascript:ttkefuyaoqing.startchats();" external>
                     立即购买
                 </a>
             </div>
@@ -127,6 +127,14 @@
             }
 
         });
+        function addCart(){
+            var qty = $("#number").val();
+            $.post('/cart/add/', {'id': {{ goods.id}},'num': qty }, function(response){
+                if(response.status == 200){
+                    alert("添加成功！");
+                }
+            });
+        }
 
         function tiaozhuan()
         {
@@ -144,8 +152,12 @@
                 $("#number").val(1);
                 qty = 1;
             }
-            $.post('/cart/add/', {'id': {{ goods.id}},'num': qty }, function (response) {
-                console.log(response);
+            $.post('/cart/add/', {'id': {{ goods.id}},'num': qty }, function(response){
+                $("#goods-amount").text(response.disPrice+"元");
+                $("del").text("价格:"+response.price);
+                if(response.msg != undefined){
+                    alert(response.msg);
+                }
             })
         }
     </script>

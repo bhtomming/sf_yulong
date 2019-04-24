@@ -584,7 +584,18 @@ class Member
 
     public function addCart(Cart $cart): self
     {
-        if (!$this->carts->contains($cart)) {
+        $unhas = true;
+        if(!$this->carts->isEmpty()){
+            foreach ($this->carts as $hasCart){
+
+                if($hasCart->getGoods() == $cart->getGoods()){
+                    $hasCart->setNum($cart->getNum());
+                    $unhas = false;
+                }
+            }
+        }
+
+        if ($unhas) {
             $this->carts[] = $cart;
             $cart->setMember($this);
         }
@@ -601,6 +612,13 @@ class Member
                 $cart->setMember(null);
             }
         }
+
+        return $this;
+    }
+
+    public function clearCart(): self
+    {
+        $this->carts->clear();
 
         return $this;
     }
