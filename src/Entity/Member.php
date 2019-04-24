@@ -114,7 +114,7 @@ class Member
     private $pointsLog;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Cart", mappedBy="member", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Cart", mappedBy="member", orphanRemoval=true, cascade={"persist", "remove"})
      */
     private $carts;
 

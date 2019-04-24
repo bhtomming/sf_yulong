@@ -173,6 +173,26 @@ div.member-tabs .tab-link.button.active{
     font-weight: normal;
     margin: 0;
 }
+header.bar a.back{
+    padding: 0.5rem 1rem;
+    font-size: 0.75em;
+    color: #333;
+}
+header .row{
+    width: 70%;
+}
+.title-tabs{
+    color: #333;
+    font-size: 0.75em;
+    line-height: 2.2rem;
+    display: inline-block;
+    text-align: center;
+    width: 28%;
+}
+.title-tabs.on{
+    color: #dd2726;
+    border-bottom: 2px solid #dd2726;
+}
 .goods-header .right{
     width: 18%;
     float: left;
@@ -195,6 +215,18 @@ div.member-tabs .tab-link.button.active{
     left: 0;
     z-index: 9999;
 }
+#share_wx_notice span {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: url(../images/share_guide.png) no-repeat right top;
+    background-size: 90% auto;
+    z-index: 9999;
+    top: 0;
+    left: 0px;
+    background-position: center -30px;
+}
+
 .goods-header .right .share {
     width: 40px;
     height: 40px;
@@ -414,7 +446,28 @@ div.member-tabs .tab-link.button.active{
     padding: 5px;
     margin-top: 47px;
 }
-
+.left-button,.right-button{
+    width: 50%;
+    float: left;
+}
+.right-button .button{
+    line-height: 2rem;
+    height: 2rem;
+    color: #fff;
+    border: none;
+}
+.right-button .button:nth-child(1){
+    background-image: linear-gradient(to right, #FFC500, #FF9402);
+}
+.right-button .button:nth-child(2){
+    background-image: linear-gradient(to right, #FF7A00, #FE560A);
+}
+.blue{
+    color: #0F83E8;
+}
+.red{
+    color: #ff2222;
+}
 
 
 

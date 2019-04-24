@@ -26,6 +26,8 @@ use App\Servers\MemberManager;
 use App\Servers\WeChatServer;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Tests\Compiler\J;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -92,25 +94,42 @@ class DefaultController extends AbstractController
 
 
     /**
-     * @Route("/cart/add/{goods_id}/{num}", name="add_cart")
+     * @Route("/cart/add/", name="add_cart")
      *
      * @IsGranted("ROLE_USER")
      */
-    public function addCart(Goods $goods, $num)
+    public function addCart(Request $request)
     {
+
+        $data['id'] = $id = $request->request->get('id');
+        $num = $request->request->get('num');
+        $em = $this->getDoctrine()->getManager();
+
+        $goods = $em->getRepository(Goods::class)->find($id);
+        $data['status'] = 200;
+
+        if(!$goods instanceof Goods){
+            $data['msg'] = '没有找到你要的商品';
+        }
+
         $member = $this->getMemberIfLogin();
 
         $cart = new Cart();
         if(!$goods->getSaling()){
-            return $this->createNotFoundException(['该商品已经下架']);
+            $data['msg'] = '该商品已经下架';
         }
         $cart->setGoods($goods);
         if($num > $goods->getStock()){
-            return $this->createNotFoundException(['该商品库存不足']);
+            $data['msg'] ='该商品库存不足';
         }
+        $data['price'] =$goods->getPrice() * $num;
         $cart->setNum($num);
         $member->addCart($cart);
-        return $this->render("default/cart.html.twig",['cart' => $cart]);
+        $em->persist($member);
+        $em->flush();
+
+        return new JsonResponse($data);
+        //return $this->render("default/cart.html.twig",['cart' => $cart]);
     }
 
     /**
@@ -342,11 +361,11 @@ class DefaultController extends AbstractController
     public function getMemberIfLogin()
     {
         $user = $this->getUser();
-        if(!($user instanceof User)){
+        if(!($user instanceof WeChat)){
             //用户未登录重定向
             return $this->redirectToRoute("home_page");
         }
-        $member = $user->getMember();
+        $member = $user->getUser()->getMember();
         return $member;
     }
 

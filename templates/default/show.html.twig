@@ -2,9 +2,12 @@
 
 {% block header %}
     <header class="bar bar-nav">
-        <a href="#">商品</a>
-        <a href="#goods_xq">详情</a>
-        <a href="#">评价</a>
+        <a href="#" class="icon icon-left pull-left back"></a>
+        <div class="row">
+            <a href="#shangping" class="title-tabs on" external>商品</a>
+            <a href="#goods_xq" class="title-tabs " external>详情</a>
+            <a href="#pingjia" class="title-tabs" external>评价</a>
+        </div>
     </header>
 {% endblock %}
 {% block body %}
@@ -17,7 +20,7 @@
         </div>
         <div class="swiper-pagination"></div>
     </div>
-    <div class="goods-header">
+    <div class="goods-header" id="shangping">
         <h3>{{ goods.name }}</h3>
         <div class="right"><div onClick="tiaozhuan()" id="pro_share" class="share">微信</div></div>
         <div id="share_wx_notice" onclick="tiaozhuan_hide()"><span></span></div>
@@ -63,9 +66,9 @@
     <div class="subNavBox" >
         <div class="subNav" data-sub="nav-mbjg"><strong>会员专享价</strong>{{ goods.discountPrice ? : goods.price }}元</div>
     </div>
-    <div class="main" id="user_goods_ka_2" >
-        <section class="index_floor">
-            <h2 style=" border-bottom:1px solid #ddd ; margin-top:40px;" name="goods_xq">
+    <div class="main" id="user_goods_ka_2">
+        <section class="index_floor" id="goods_xq">
+            <h2 style=" border-bottom:1px solid #ddd ; margin-top:40px;" >
                 <span></span>详细信息
             </h2>
         </section>
@@ -80,27 +83,32 @@
 {% endblock %}
 
 {% block navigation %}
+
     <nav class="bar bar-tab">
-        <a class="tab-item external active" href="{{ path("home_page") }}">
-            <span class="icon icon-home"></span>
-            <span class="tab-label">首页</span>
-        </a>
-        <a class="tab-item external" href="{{ path("hot_sale") }}">
-            <span class="icon icon-app"></span>
-            <span class="tab-label">客服</span>
-        </a>
-        <a class="tab-item external" href="{{ path("member_sale_link") }}">
-            <span class="icon icon-share"></span>
-            <span class="tab-label">收藏</span>
-        </a>
-        <a class="tab-item external" href="{{ path("member_center") }}">
-            <span class="icon icon-me"></span>
-            <span class="tab-label">加入购物车</span>
-        </a>
-        <a class="tab-item external" href="javascript:ttkefuyaoqing.startchats()" external>
-            <span class="icon icon-emoji"></span>
-            <span class="tab-label">立即购买</span>
-        </a>
+        <div class="left-button">
+            <a class="tab-item external" href="{{ path("home_page") }}">
+                <span class="icon icon-home"></span>
+                <span class="tab-label">首页</span>
+            </a>
+            <a class="tab-item external" href="javascript:ttkefuyaoqing.startchats()" external>
+                <span class="icon icon-message blue"></span>
+                <span class="tab-label">客服</span>
+            </a>
+            <a class="tab-item external" href="{{ path("member_sale_link") }}">
+                <span class="icon icon-star red"></span>
+                <span class="tab-label">收藏</span>
+            </a>
+        </div>
+        <div class="right-button">
+            <div class="buttons-row">
+                <a class="button button-round" href="{{ path("add_cart",{'goods_id':goods.id,'num':1}) }}">
+                    加入购物车
+                </a>
+                <a class="button button-round" href="javascript:ttkefuyaoqing.startchats()" external>
+                    立即购买
+                </a>
+            </div>
+        </div>
     </nav>
 {% endblock %}
 
@@ -119,5 +127,26 @@
             }
 
         });
+
+        function tiaozhuan()
+        {
+            $('#share_wx_notice').show();
+        }
+        function tiaozhuan_hide()
+        {
+            $('#share_wx_notice').hide();
+        }
+
+        function changePrice()
+        {
+            var qty = $("#number").val();
+            if(qty <=0 ){
+                $("#number").val(1);
+                qty = 1;
+            }
+            $.post('/cart/add/', {'id': {{ goods.id}},'num': qty }, function (response) {
+                console.log(response);
+            })
+        }
     </script>
 {% endblock %}
