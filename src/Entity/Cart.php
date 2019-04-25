@@ -23,7 +23,7 @@ class Cart
     private $member;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Goods", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Goods")
      * @ORM\JoinColumn(nullable=false)
      */
     private $goods;

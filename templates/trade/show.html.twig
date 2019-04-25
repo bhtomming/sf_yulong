@@ -2,6 +2,63 @@
 
 {% block header %}
     <header class="bar bar-nav">
+        <a href="#" class="icon icon-left pull-left back"></a>
         <h1 class="title">订单信息</h1>
     </header>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div class="content-block-title">订单编号:{{ trade.tradeNo }}</div>
+        {% for goods in trade.goodsSnapshot %}
+        <div class="list-block">
+            <ul>
+                <li class="item-content">
+                    <div class="item-media"><i class="icon icon-f7"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title">商品名称</div>
+                        <div class="item-after">{{ goods.goodsName }}</div>
+                    </div>
+                </li>
+                <li class="item-content">
+                    <div class="item-media"><i class="icon icon-f7"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title">价格</div>
+                        <div class="item-after">{{ goods.goodsPrice }}元</div>
+                    </div>
+                </li>
+                <li class="item-content">
+                    <div class="item-media"><i class="icon icon-f7"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title">数量</div>
+                        <div class="item-after">{{ goods.goodsNum }}</div>
+                    </div>
+                </li>
+                <li class="item-content">
+                    <div class="item-media"><i class="icon icon-f7"></i></div>
+                    <div class="item-inner">
+                        <div class="item-title">金额</div>
+                        <div class="item-after">{{ goods.goodsNum * goods.goodsPrice }}元</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        {% endfor %}
+        {% if trade.status == 0 %}
+        <div class="content-block">
+            <div class="row">
+                <div class="col-100"><a href="javascript:zhifu();" class="button button-big button-fill button-success">确认支付</a></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function zhifu(){
+            window.location.href = "{{ absolute_url(path('paying',{'id': trade.id })) }}";
+        }
+    </script>
 {% endblock %}

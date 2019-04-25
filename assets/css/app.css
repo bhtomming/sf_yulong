@@ -11,6 +11,9 @@ ul,li{
 html,body {
     background-color: lightgray;
 }
+a{
+    color: #3d4145;
+}
 header .swiper-container{
     width: 750px;
     height: 398px;
@@ -469,7 +472,19 @@ header .row{
     color: #ff2222;
 }
 
-
+/***********订单**************/
+.item-content{
+    position: relative;
+}
+.order-item-after{
+    position: absolute;
+    color: #ff2222;
+    max-height: 1.8rem;
+    width: 3rem;
+    z-index:5;
+    right: 0;
+    top: 0.4rem;
+}
 
 
 

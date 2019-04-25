@@ -4,13 +4,32 @@
 {% set member = user.member %}
 {% block header %}
     <header class="bar bar-nav">
-        <a href="{{ path("member_center") }}" class="icon icon-left pull-left"></a>
+        <a href="#" class="icon icon-left pull-left back"></a>
         <h1 class="title">我的订单</h1>
     </header>
 {% endblock %}
 
 {% block body %}
     <div class="content">
-        {{ include('member/order_item.html.twig',{'order': member.trades}) }}
+        {{ include('member/order_item.html.twig',{'orders': member.trades}) }}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(".icon-remove").click(function(event){
+            var dist = $(this);
+            var parent = dist.parent().parent().parent();
+            $.confirm("您确认要删除该订单?",function(){
+                var no = dist.data('no');
+                $.post('/order/del',{'no': no},function(res){
+                    $.alert(res.msg);
+                    if(res.status == 200){
+                        parent.remove();
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

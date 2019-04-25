@@ -58,7 +58,7 @@ class Trade
     private $member;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\GoodsSnapshot", mappedBy="trade")
+     * @ORM\OneToMany(targetEntity="App\Entity\GoodsSnapshot", mappedBy="trade", cascade={"persist", "remove"})
      */
     private $goodsSnapshot;
 
@@ -86,6 +86,7 @@ class Trade
         $this->status = self::UNPAY;
         $this->logisticsStatus = self::UNSEND;
         $dateTime = new \DateTime('now');
+        $this->setCreateTime($dateTime);
         $dateTime->modify("+30 minute");
         $this->setExamineTime($dateTime);
     }

@@ -136,15 +136,35 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/cart/del/{id}/{num}", name="remove_cart")
+     * @Route("/cart/del", name="remove_cart")
      *
      * @IsGranted("ROLE_USER")
      */
-    public function removeCart(Cart $cart)
+    public function removeCart(Request $request)
     {
+        $carts = $request->request->get('carts');
+
+        $data['status'] = 200;
+        if(empty($carts)){
+            $data['msg'] = '请选择一个清单';
+        }
+        $em = $this->getDoctrine()->getManager();
         $member = $this->getMemberIfLogin();
-        $member->removeCart($cart);
-        return $this->redirectToRoute("list_cart");
+        foreach ($carts as $cartId){
+            $cart = $em->getRepository(Cart::class)->find($cartId);
+            if(!$cart instanceof Cart){
+                $data['msg'] = '没有你的购物清单';
+            }else{
+                $member->removeCart($cart);
+                $data['msg'] = '删除成功';
+            }
+        }
+
+        $em->persist($member);
+        $em->flush();
+
+        return new JsonResponse($data);
+        //return $this->redirectToRoute("list_cart");
     }
 
     /**
@@ -190,16 +210,27 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/order/add", name="add_order")
+     * @IsGranted("ROLE_USER")
      * 下订单,生成订单
      */
-    public function addOrder()
+    public function addOrder(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+        $cartsId = $request->request->get('carts');
+        $data = [
+            'status' => 201,
+            'msg' => '',
+        ];
         $member = $this->getMemberIfLogin();
         $carts = $member->getCarts();
+        if(null != $cartsId){
+            foreach ($cartsId as $id){
+                $carts[] = $em->getRepository(Cart::class)->find($id);
+            }
+        }
         //创建订单
         $trade = new Trade();
 
-        $em = $this->getDoctrine()->getManager();
         $pointsConfig = $em->getRepository(PointsConfig::class)->find(1);
         $pointRest = $pointsConfig->getGivePoint() / 100;
         $points = 0;
@@ -214,23 +245,90 @@ class DefaultController extends AbstractController
             $points += $price * $pointRest * $num;
             $goodsSnapshot->setGoodsId($goods->getId());
             $goodsSnapshot->setGoodsName($goods->getName());
-            $goodsSnapshot->getGoodsImg($goods->getGoodsImg);
+            $goodsSnapshot->setGoodsImg($goods->getTitleImg());
             $goodsSnapshot->setGoodsNum($num);
             $goodsSnapshot->setGoodsPrice($price);
-            $goodsSnapshot->setGoodsLink("goods/show/".$goods->getId());
+            $goodsSnapshot->setTradeNo($trade->getTradeNo());
+            $goodsSnapshot->setGoodsLink($this->generateUrl('goods_show',['id'=>$goods->getId()]));
             $trade->addGoodsSnapshot($goodsSnapshot);
+            //清空购物车
+            $em->remove($cart);
+            $em->flush();
         }
+        $payLog = new PayLog();
+        $payLog->setPoints($points);
+        $payLog->setTotalFee($amount * 100);
+        $payLog->setStatus("未付款");
+        $payLog->setTradeNo($trade->getTradeNo());
+        $member->addPayLog($payLog);
+        $trade->setPayLog($payLog);
         //订单送的积分
         $trade->setGivePoints($points);
         //订单总金额
         $trade->setTotalAmount($amount);
-        $member->addTrade($trade);
+        $em->persist($trade);
+        //$em->flush();
+        $member->addTrades($trade);
+        $em->persist($member);
+        $em->flush();
+        $data['status'] = 200;
 
-        return $this->render('default/show.html.twig',['trade'=>$trade]);
+        return new JsonResponse($data);
+        //return $this->render('default/show.html.twig',['trade'=>$trade]);
+    }
+
+    /**
+     * @Route("/order/show", name="show_order")
+     * @IsGranted("ROLE_USER")
+     * 显示订单
+     */
+    public function showOrder(Request $request)
+    {
+        $member = $this->getMemberIfLogin();
+        $id = $request->query->get('id');
+        if(null != $id){
+            $em = $this->getDoctrine()->getManager();
+            $trade = $em->getRepository(Trade::class)->find($id);
+        }else{
+            $trade = $member->getTrades()->last();
+        }
+
+        return $this->render('trade/show.html.twig',['trade'=>$trade]);
+    }
+
+    /**
+     * @Route("/order/del", name="del_order")
+     * @IsGranted("ROLE_USER")
+     * 删除订单
+     */
+    public function delOrder(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $no = $request->request->get('no');
+        $data = [
+            'status' => 201,
+            'msg' => "订单号无效，请查证后再删除",
+        ];
+        if(null == $no){
+            $data['msg'] = "请添加要删除的订单号";
+        }
+        $order = $em->getRepository(Trade::class)->findOneBy(['tradeNo'=>$no]);
+        if($order instanceof Trade){
+            $member = $this->getMemberIfLogin();
+            $member->removeTrades($order);
+            $em->remove($order);
+            $em->flush();
+            $data['msg'] = "成功删除订单";
+            $data['status'] = 200;
+        }
+
+        return new JsonResponse($data);
+
     }
 
     /**
      * @Route("/paying/{id}", name="paying")
+     * @IsGranted("ROLE_USER")
      * 支付页面
      */
     public function paying(Trade $trade)
@@ -289,11 +387,13 @@ class DefaultController extends AbstractController
 
                     $payLog = new PayLog();
                     $payLog->setPoints($points)
-                        ->setStatus("微信支付")
+                        ->setStatus("已支付")
+                        ->setPayType("微信支付")
                         ->setPayNo($data['transaction_id'])
                         ->setPayTime(new \DateTime('now'))
                         ->setTotalFee($data['cash_fee'])
-                        ->setMember($member);
+                        ;
+                    $member->addPayLog($payLog);
                     $trade->setPayLog($payLog);
                     $memberManager = new MemberManager($em);
                     //分配订单积分

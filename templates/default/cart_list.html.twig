@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+{% block header %}
+    <header class="bar bar-nav">
+        <a href="#" class="icon icon-left pull-left back"></a>
+        <h2 class="title">
+            我的购物车
+        </h2>
+    </header>
+{% endblock %}
+
+{% block body %}
+
+    <div id="cart-content" class="content">
+        <div class="list-block media-list">
+            <ul>
+                {% for cart in carts %}
+                    {% set goods = cart.goods %}
+                <li>
+                    <label class="label-checkbox item-content">
+                        <input type="checkbox" name="shopping-cart" value="{{ cart.id }}">
+                        <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                        <div class="item-media"><img src="{{ asset(goods.titleImg) }}" style='width: 4rem;'></div>
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{{ goods.name }}</div>
+                                <div class="item-after">{{ goods.discountPrice * cart.num }}元</div>
+                            </div>
+                            <div class="item-subtitle">{{ goods.name }}</div>
+                            <div class="item-text">{{ goods.summary }}</div>
+                        </div>
+                    </label>
+                </li>
+                    {% else %}
+                        <li>
+                            <label class="label-checkbox item-content">
+                            您的购物车没有任何商品.
+                            </label>
+                        </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="content-block">
+            <div class="row">
+                <div class="col-50"><a href="javascript:delcart();" class="button button-big button-fill button-danger">删除</a></div>
+                <div class="col-50"><a href="javascript:jiesuan();" class="button button-big button-fill button-success">结算</a></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function jiesuan(){
+            var inputs = $('input[type=checkbox]:checked');
+            if(inputs.length > 0) {
+                var carts = new Array(inputs.length - 1);
+                var i = 0;
+                $.each(inputs, function () {
+                    carts[i] = $(this).val();
+                    i++;
+                });
+                $.post('/order/add', {'carts': carts}, function (response) {
+                    if (response.msg != undefined && response.status == 200) {
+                        window.location.href = "{{ absolute_url(path('show_order')) }}";
+                    }
+                });
+            }
+        }
+        function delcart(){
+            var inputs = $('input[type=checkbox]:checked');
+            if(inputs.length > 0){
+                var carts = new Array(inputs.length - 1);
+                var i = 0;
+                $.each(inputs,function(){
+                    carts[i] = $(this).val();
+                    i++;
+                });
+                $.post('/cart/del', {'carts': carts}, function(response){
+                    if(response.msg != undefined){
+                        inputs.attr('checked',false).parent().parent().remove();
+                        $.alert(response.msg);
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}

@@ -20,7 +20,7 @@ class GoodsImage
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $filename;
 
@@ -51,7 +51,7 @@ class GoodsImage
         return $this->filename;
     }
 
-    public function setFilename(string $filename): self
+    public function setFilename(?string $filename): self
     {
         $this->filename = $filename;
 

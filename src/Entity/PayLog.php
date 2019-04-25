@@ -23,7 +23,8 @@ class PayLog
 
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * 支付单号
      */
     private $payNo;
 
@@ -33,7 +34,7 @@ class PayLog
     private $totalFee;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $payType;
 
@@ -43,7 +44,8 @@ class PayLog
     private $points;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
+     * 支付时间
      */
     private $payTime;
 
